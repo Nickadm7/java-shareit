@@ -7,6 +7,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -35,6 +36,12 @@ public class ItemController {
     public ItemDto getItemById(@PathVariable Long itemId) {
         log.info("GET-запрос к эндпоинту /items найти пользователя по id: {}", itemId);
         return itemService.getItemById(itemId);
+    }
+
+    @GetMapping("/search")
+    public List<ItemDto> search(@RequestParam (name = "text") String text) {
+        log.info("GET-запрос к эндпоинту /items/search найти: {}", text);
+        return null;
     }
 
     @PatchMapping("/{itemId}")
