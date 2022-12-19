@@ -8,12 +8,10 @@ import ru.practicum.shareit.user.UserService;
 @Service
 public class Utils {
     private final UserService userService;
-    private final ItemService itemService;
 
     @Autowired
     public Utils(UserService userService, ItemService itemService) {
         this.userService = userService;
-        this.itemService = itemService;
     }
 
     public boolean isUserExist(Long ownerId) {
