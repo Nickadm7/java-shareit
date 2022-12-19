@@ -40,7 +40,7 @@ public class InMemoryUserStorage implements UserStorage {
         if (userDbStorage.containsKey(userId)) {
             return userDbStorage.get(userId);
         } else {
-            throw new IllegalArgumentException("user с id: " + userId + " не найден!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
 

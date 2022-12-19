@@ -5,9 +5,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class InMemoryItemStorage implements ItemStorage {
@@ -25,12 +24,14 @@ public class InMemoryItemStorage implements ItemStorage {
         if (item.getName().isEmpty() || item.getDescription().isEmpty() || item.getAvailable() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        if (item.getDescription() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         if (item.getId() == null) {
             item.setId(generateItemId());
         }
         itemDbStorage.put(item.getId(), item);
         return itemDbStorage.get(item.getId());
-
     }
 
     @Override
@@ -52,20 +53,21 @@ public class InMemoryItemStorage implements ItemStorage {
         if (item.getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        if (!itemDbStorage.containsKey(item.getId())) {
+        Long currentId = item.getId();
+        if (!itemDbStorage.containsKey(currentId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         if (item.getName() == null) {
-            item.setName(itemDbStorage.get(item.getId()).getName());
+            item.setName(itemDbStorage.get(currentId).getName());
         }
         if (item.getDescription() == null) {
-            item.setDescription(itemDbStorage.get(item.getId()).getDescription());
+            item.setDescription(itemDbStorage.get(currentId).getDescription());
         }
         if (item.getAvailable() == null) {
-            item.setAvailable(itemDbStorage.get(item.getId()).getAvailable());
+            item.setAvailable(itemDbStorage.get(currentId).getAvailable());
         }
-        itemDbStorage.put(item.getId(), item);
-        return itemDbStorage.get(item.getId());
+        itemDbStorage.put(currentId, item);
+        return itemDbStorage.get(currentId);
     }
 
     @Override
@@ -75,6 +77,19 @@ public class InMemoryItemStorage implements ItemStorage {
         } else {
             throw new IllegalArgumentException("user с id: " + itemId + " не найден!");
         }
+    }
+
+    @Override
+    public Collection<Item> searchItem(String text) {
+        List<Item> searchAvailableItems = new ArrayList<>();
+        if (!text.isBlank()) {
+            searchAvailableItems = itemDbStorage.values().stream()
+                    .filter(item -> item.getAvailable())
+                    .filter(item -> item.getName().toLowerCase().contains(text) ||
+                            item.getDescription().toLowerCase().contains(text))
+                    .collect(Collectors.toList());
+        }
+        return searchAvailableItems;
     }
 
     public Long generateItemId() {

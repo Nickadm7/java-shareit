@@ -2,8 +2,11 @@ package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.utils.Utils;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -14,16 +17,23 @@ import java.util.List;
 @RequestMapping("/items")
 public class ItemController {
     private final ItemService itemService;
+    private final Utils utils;
+    private static final String OWNER_ID = "X-Sharer-User-Id";
 
     @Autowired
-    public ItemController(ItemService itemService) {
+    public ItemController(ItemService itemService, Utils utils) {
         this.itemService = itemService;
+        this.utils = utils;
     }
 
     @PostMapping
-    public ItemDto addItems(@Valid @RequestBody ItemDto itemDto) {
-        log.info("POST-запрос к эндпоинту /items");
-        return itemService.addItem(itemDto);
+    public ItemDto addItems(@Valid @RequestBody ItemDto itemDto, @RequestHeader(OWNER_ID) Long ownerId) {
+        log.info("POST-запрос к эндпоинту /items owner_id: {}", ownerId);
+        if (utils.isUserExist(ownerId)) {
+            return itemService.addItem(itemDto, ownerId);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping
@@ -39,15 +49,20 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> search(@RequestParam (name = "text") String text) {
+    public List<ItemDto> searchItem(@RequestParam String text) {
         log.info("GET-запрос к эндпоинту /items/search найти: {}", text);
-        return null;
+        return itemService.searchItem(text);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@Valid @RequestBody ItemDto itemDto, @PathVariable Long itemId) {
+    public ItemDto updateItem(@RequestBody ItemDto itemDto, @PathVariable Long itemId,
+                              @RequestHeader(OWNER_ID) Long ownerId) {
         log.info("PATCH-запрос к эндпоинту /items обновить пользователя по id: {}", itemId);
-        return itemService.updateItem(itemDto, itemId);
+        if (utils.isUserExist(ownerId)) {
+            return itemService.updateItem(itemDto, itemId, ownerId);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
 
     @DeleteMapping("/{itemId}")

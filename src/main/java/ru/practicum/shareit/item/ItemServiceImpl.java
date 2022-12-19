@@ -19,13 +19,22 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto addItem(ItemDto itemDto) {
+    public ItemDto addItem(ItemDto itemDto, Long ownerId) {
         return itemMapper.toItemDto(itemStorage.addItem(itemMapper.toItem(itemDto)));
+
     }
 
     @Override
     public ItemDto getItemById(Long itemId) {
         return itemMapper.toItemDto(itemStorage.getItemById(itemId));
+    }
+
+    @Override
+    public List<ItemDto> searchItem(String text) {
+        text = text.toLowerCase();
+        return itemStorage.searchItem(text).stream()
+                .map(itemMapper::toItemDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -36,11 +45,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto updateItem(ItemDto itemDto, Long itemId) {
+    public ItemDto updateItem(ItemDto itemDto, Long itemId, Long ownerId) {
         if (itemDto.getId() == null) {
             itemDto.setId(itemId);
         }
-        return itemMapper.toItemDto(itemStorage.updateItem(itemMapper.toItem(itemDto)));
+
+            return itemMapper.toItemDto(itemStorage.updateItem(itemMapper.toItem(itemDto)));
+
     }
 
     @Override

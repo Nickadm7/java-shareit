@@ -11,7 +11,9 @@ import javax.validation.constraints.Email;
 @AllArgsConstructor
 public class UserDto {
     private Long id; //уникальный идентификатор пользователя
+
     private String name; //имя или логин пользователя
+
     @Email
     private String email; //адрес электронной почты
 }
