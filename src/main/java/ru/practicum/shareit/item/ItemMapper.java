@@ -17,13 +17,13 @@ public class ItemMapper {
         );
     }
 
-    public Item toItem(ItemDto itemDto) {
+    public Item toItem(ItemDto itemDto, Long ownerId) {
         return new Item(
                 itemDto.getId(),
                 itemDto.getName(),
                 itemDto.getDescription(),
                 itemDto.getAvailable(),
-                itemDto.getOwner(),
+                ownerId,
                 itemDto.getRequest()
         );
     }

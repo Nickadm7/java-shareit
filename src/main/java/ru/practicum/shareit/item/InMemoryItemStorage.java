@@ -6,7 +6,8 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Component
 public class InMemoryItemStorage implements ItemStorage {
@@ -44,8 +45,10 @@ public class InMemoryItemStorage implements ItemStorage {
     }
 
     @Override
-    public Collection<Item> getAllItems() {
-        return itemDbStorage.values();
+    public List<Item> getAllItemsByOwner(Long ownerId) {
+        return itemDbStorage.values().stream()
+                .filter(item -> item.getOwner().equals(ownerId))
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @Override
@@ -84,10 +87,10 @@ public class InMemoryItemStorage implements ItemStorage {
         List<Item> searchAvailableItems = new ArrayList<>();
         if (!text.isBlank()) {
             searchAvailableItems = itemDbStorage.values().stream()
-                    .filter(item -> item.getAvailable())
+                    .filter(Item::getAvailable)
                     .filter(item -> item.getName().toLowerCase().contains(text) ||
                             item.getDescription().toLowerCase().contains(text))
-                    .collect(Collectors.toList());
+                    .collect(toList());
         }
         return searchAvailableItems;
     }

@@ -1,7 +1,9 @@
 package ru.practicum.shareit.item;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.List;
@@ -20,7 +22,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto addItem(ItemDto itemDto, Long ownerId) {
-        return itemMapper.toItemDto(itemStorage.addItem(itemMapper.toItem(itemDto)));
+        return itemMapper.toItemDto(itemStorage.addItem(itemMapper.toItem(itemDto, ownerId)));
 
     }
 
@@ -38,8 +40,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getAllItems() {
-        return itemStorage.getAllItems().stream()
+    public List<ItemDto> getAllItemsByOwner(Long ownerId) {
+        return itemStorage.getAllItemsByOwner(ownerId).stream()
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
@@ -49,13 +51,19 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getId() == null) {
             itemDto.setId(itemId);
         }
-
-            return itemMapper.toItemDto(itemStorage.updateItem(itemMapper.toItem(itemDto)));
-
+        if (itemStorage.getItemById(itemId).getOwner().equals(ownerId)) {
+            return itemMapper.toItemDto(itemStorage.updateItem(itemMapper.toItem(itemDto, ownerId)));
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
 
     @Override
-    public void deleteById(Long itemId) {
-        itemStorage.deleteItemById(itemId);
+    public void deleteById(Long itemId, Long ownerId) {
+        if (itemStorage.getItemById(itemId).getOwner().equals(ownerId)) {
+            itemStorage.deleteItemById(itemId);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
     }
 }

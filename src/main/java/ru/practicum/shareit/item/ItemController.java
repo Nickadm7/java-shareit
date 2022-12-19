@@ -9,7 +9,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.utils.Utils;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -37,9 +36,9 @@ public class ItemController {
     }
 
     @GetMapping
-    public Collection<ItemDto> getAllItems() {
-        log.info("GET-запрос к эндпоинту /items список всех пользователей");
-        return itemService.getAllItems();
+    public List<ItemDto> getAllItemsByOwner(@RequestHeader(OWNER_ID) Long ownerId) {
+        log.info("GET-запрос к эндпоинту /items список всех вещей пользователя");
+        return itemService.getAllItemsByOwner(ownerId);
     }
 
     @GetMapping("/{itemId}")
@@ -54,6 +53,7 @@ public class ItemController {
         return itemService.searchItem(text);
     }
 
+    @ResponseBody
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(@RequestBody ItemDto itemDto, @PathVariable Long itemId,
                               @RequestHeader(OWNER_ID) Long ownerId) {
@@ -66,8 +66,8 @@ public class ItemController {
     }
 
     @DeleteMapping("/{itemId}")
-    public void deleteById(@PathVariable Long itemId) {
+    public void deleteById(@PathVariable Long itemId, @RequestHeader(OWNER_ID) Long ownerId) {
         log.info("DELETE-запрос к эндпоинту /items удалить пользователя с id: {}", itemId);
-        itemService.deleteById(itemId);
+        itemService.deleteById(itemId, ownerId);
     }
 }
