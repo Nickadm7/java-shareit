@@ -13,7 +13,7 @@ import static java.util.stream.Collectors.toList;
 public class InMemoryItemStorage implements ItemStorage {
     private final Map<Long, Item> itemDbStorage;
 
-    Long id;
+    private Long id;
 
     public InMemoryItemStorage() {
         itemDbStorage = new HashMap<>();
@@ -47,7 +47,7 @@ public class InMemoryItemStorage implements ItemStorage {
     @Override
     public List<Item> getAllItemsByOwner(Long ownerId) {
         return itemDbStorage.values().stream()
-                .filter(item -> item.getOwner().equals(ownerId))
+                .filter(item -> item.getOwner().getId().equals(ownerId))
                 .collect(java.util.stream.Collectors.toList());
     }
 

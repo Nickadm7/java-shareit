@@ -1,20 +1,22 @@
 package ru.practicum.shareit.utils;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.UserStorage;
+import ru.practicum.shareit.user.model.User;
 
 @Service
+@RequiredArgsConstructor
 public class Utils {
     private final UserService userService;
-
-    @Autowired
-    public Utils(UserService userService, ItemService itemService) {
-        this.userService = userService;
-    }
+    private final UserStorage userStorage;
 
     public boolean isUserExist(Long ownerId) {
         return userService.getUserById(ownerId) != null;
+    }
+
+    public User getUserById(Long userId) {
+        return userStorage.getUserById(userId);
     }
 }

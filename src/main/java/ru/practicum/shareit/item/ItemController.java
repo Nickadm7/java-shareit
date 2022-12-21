@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,17 +13,12 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/items")
 public class ItemController {
     private final ItemService itemService;
     private final Utils utils;
     private static final String OWNER_ID = "X-Sharer-User-Id";
-
-    @Autowired
-    public ItemController(ItemService itemService, Utils utils) {
-        this.itemService = itemService;
-        this.utils = utils;
-    }
 
     @PostMapping
     public ItemDto addItems(@Valid @RequestBody ItemDto itemDto, @RequestHeader(OWNER_ID) Long ownerId) {
