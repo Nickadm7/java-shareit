@@ -6,10 +6,16 @@ import lombok.NoArgsConstructor;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
+import javax.persistence.*;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "items")
 public class Item {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; //уникальный идентификатор вещи
 
     private String name; //краткое название
@@ -18,7 +24,11 @@ public class Item {
 
     private Boolean available; //статус о том, доступна или нет вещь для аренды
 
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
     private User owner; //владелец вещи
 
+    @ManyToOne
+    @JoinColumn(name = "request_id")
     private ItemRequest itemRequest; //если вещь была создана по запросу другого пользователя, то храним его
 }

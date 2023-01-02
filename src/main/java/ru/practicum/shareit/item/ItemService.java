@@ -7,11 +7,11 @@ import java.util.List;
 public interface ItemService {
     ItemDto addItem(ItemDto itemDto, Long ownerId);
 
-    List<ItemDto> getAllItemsByOwner(Long ownerId);
+    List<ItemDto> findItemsByOwnerId(Long ownerId);
 
     ItemDto getItemById(Long itemId);
 
-    List<ItemDto> searchItem(String text);
+    List<ItemDto> findItemsByText(String text);
 
     void deleteById(Long itemId, Long ownerId);
 

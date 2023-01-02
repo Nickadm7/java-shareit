@@ -31,9 +31,9 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getAllItemsByOwner(@RequestHeader(OWNER_ID) Long ownerId) {
+    public List<ItemDto> findItemsByOwnerId(@RequestHeader(OWNER_ID) Long ownerId) {
         log.info("GET-запрос к эндпоинту /items список всех вещей пользователя");
-        return itemService.getAllItemsByOwner(ownerId);
+        return itemService.findItemsByOwnerId(ownerId);
     }
 
     @GetMapping("/{itemId}")
@@ -43,9 +43,9 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItem(@RequestParam String text) {
+    public List<ItemDto> findItemsByText(@RequestParam String text) {
         log.info("GET-запрос к эндпоинту /items/search найти: {}", text);
-        return itemService.searchItem(text);
+        return itemService.findItemsByText(text);
     }
 
     @ResponseBody
