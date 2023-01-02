@@ -20,7 +20,7 @@ public class Booking {
 
     private Item item; //вещь, которую пользователь бронирует
 
-    private User user; //пользователь, который осуществляет бронирование
+    private User booker; //пользователь, который осуществляет бронирование
 
     private Status status; //статус бронирования
 }
