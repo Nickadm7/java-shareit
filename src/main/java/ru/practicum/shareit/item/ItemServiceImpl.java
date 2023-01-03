@@ -7,6 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,11 +28,17 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto getItemById(Long itemId) {
+        if (itemRepository.findById(itemId).isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
         return ItemMapper.toItemDto(itemRepository.getReferenceById(itemId));
     }
 
     @Override
     public List<ItemDto> findItemsByText(String text) {
+        if (text.isEmpty()) {
+            return new ArrayList<>();
+        }
         text = text.toLowerCase();
         return itemRepository.findItemsByText(text).stream()
                 .map(ItemMapper::toItemDto)
@@ -50,8 +57,20 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getId() == null) {
             itemDto.setId(itemId);
         }
+        if (itemId == null || ownerId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        if (itemDto.getName() == null) {
+            itemDto.setName(itemRepository.findById(itemId).get().getName());
+        }
+        if (itemDto.getDescription() == null) {
+            itemDto.setDescription(itemRepository.findById(itemId).get().getDescription());
+        }
+        if (itemDto.getAvailable() == null) {
+            itemDto.setAvailable(itemRepository.findById(itemId).get().getAvailable());
+        }
         if ((itemRepository.findById(itemId).get().getOwner().getId()).equals(ownerId)) {
-            return ItemMapper.toItemDto(itemRepository.findById(ItemMapper.toItem(itemDto, utils.getUserById(ownerId)).getId()).get());
+            return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto, utils.getUserById(ownerId))));
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
