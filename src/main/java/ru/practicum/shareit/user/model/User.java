@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 
-@Data
+@Data //TODO
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -18,6 +18,7 @@ public class User {
     private Long id; //уникальный идентификатор пользователя
 
     private String name; //имя или логин пользователя
+
     @Email
     private String email; //адрес электронной почты
 }

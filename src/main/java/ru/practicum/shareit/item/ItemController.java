@@ -45,7 +45,7 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> findItemsByText(@RequestParam String text) {
         log.info("GET-запрос к эндпоинту /items/search найти: {}", text);
-        return itemService.findItemsByText(text);
+        return itemService.findItemsByText  (text);
     }
 
     @ResponseBody
