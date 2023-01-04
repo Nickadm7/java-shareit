@@ -27,9 +27,10 @@ public class Utils {
         return itemRepository.getReferenceById(itemId);
     }
 
-    public boolean isItemExist (Long itemId) {
-        return itemRepository.findById(itemId).isPresent();
+    public boolean isItemExist(Long itemId) {
+        return itemRepository.existsById(itemId);
     }
+
     public boolean isItemAvailable(Long itemId) {
         return itemRepository.findById(itemId).get().getAvailable(); //TODO
     }
