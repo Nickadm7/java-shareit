@@ -2,6 +2,7 @@ package ru.practicum.shareit.utils;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
@@ -14,6 +15,7 @@ public class Utils {
     private final UserService userService;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final BookingRepository bookingRepository;
 
     public boolean isUserExist(Long ownerId) {
         return userService.getUserById(ownerId) != null;
@@ -33,5 +35,9 @@ public class Utils {
 
     public boolean isItemAvailable(Long itemId) {
         return itemRepository.findById(itemId).get().getAvailable(); //TODO
+    }
+
+    public boolean isBookingExistById(Long bookingId) {
+        return bookingRepository.findById(bookingId).isPresent();
     }
 }

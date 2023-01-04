@@ -1,9 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.booking.dto.BookingAddDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +21,9 @@ public class BookingController {
     private static final String OWNER_ID = "X-Sharer-User-Id";
 
     @PostMapping
-    public BookingDto addBooking(@Valid @RequestBody BookingAddDto bookingAddDto, @RequestHeader(OWNER_ID) Long bookerId) {
+    public BookingAddDto bookingAddDto(@Valid @RequestBody BookingAddDto bookingAddDto, @RequestHeader(OWNER_ID) Long bookerId) {
         log.info("POST-запрос к эндпоинту /bookings владелец id: {}", bookerId);
-        if (utils.isUserExist(bookerId)) {
-            return bookingService.addBooking(bookingAddDto, bookerId);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+        return bookingService.addBooking(bookingAddDto, bookerId);
     }
 
     @GetMapping("/{bookingId}")

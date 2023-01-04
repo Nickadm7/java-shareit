@@ -9,7 +9,7 @@ import ru.practicum.shareit.user.model.User;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.FutureOrPresent;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * TODO Sprint add-bookings.
@@ -22,10 +22,10 @@ public class BookingDto {
     private Long id; //уникальный идентификатор бронирования
 
     @FutureOrPresent
-    private LocalDate start; //дата и время начала бронирования
+    private LocalDateTime start; //дата и время начала бронирования
 
     @Future
-    private LocalDate end; //дата и время конца бронирования
+    private LocalDateTime end; //дата и время конца бронирования
 
     private Item item; //вещь, которую пользователь бронирует
 

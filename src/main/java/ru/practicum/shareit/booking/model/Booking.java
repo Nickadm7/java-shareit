@@ -7,7 +7,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data //TODO
 @NoArgsConstructor
@@ -20,10 +20,10 @@ public class Booking {
     private Long id; //уникальный идентификатор бронирования
 
     @Column(name = "start_date")
-    private LocalDate start; //дата и время начала бронирования
+    private LocalDateTime start; //дата и время начала бронирования
 
     @Column(name = "end_date")
-    private LocalDate end; //дата и время конца бронирования
+    private LocalDateTime end; //дата и время конца бронирования
 
     @ManyToOne
     @JoinColumn(name = "item_id")
