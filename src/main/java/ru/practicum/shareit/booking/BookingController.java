@@ -21,7 +21,7 @@ public class BookingController {
     private static final String OWNER_ID = "X-Sharer-User-Id";
 
     @PostMapping
-    public BookingAddDto bookingAddDto(@Valid @RequestBody BookingAddDto bookingAddDto, @RequestHeader(OWNER_ID) Long bookerId) {
+    public BookingDto bookingAddDto(@Valid @RequestBody BookingAddDto bookingAddDto, @RequestHeader(OWNER_ID) Long bookerId) {
         log.info("POST-запрос к эндпоинту /bookings владелец id: {}", bookerId);
         return bookingService.addBooking(bookingAddDto, bookerId);
     }

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingAddDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -23,6 +24,18 @@ public class BookingMapper {
         );
     }
 
+    public static BookingDto toBookingAddDto(Booking booking) {
+        return new BookingDto(
+                booking.getId(),
+                booking.getStart(),
+                booking.getEnd(),
+                booking.getItem(),
+                booking.getBooker(),
+                Status.WAITING
+        );
+
+    }
+
     public static Booking toBooking(BookingDto bookingDto, User owner) { //TODO
         return new Booking(
                 bookingDto.getId(),
@@ -40,6 +53,7 @@ public class BookingMapper {
         booking.setEnd(bookingAddDto.getEnd());
         booking.setItem(item);
         booking.setBooker(owner);
+        booking.setStatus(Status.WAITING);
         return booking;
     }
 

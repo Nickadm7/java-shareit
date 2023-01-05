@@ -34,5 +34,5 @@ public class Booking {
     private User booker; //пользователь, который осуществляет бронирование
 
     @Enumerated(EnumType.STRING)
-        private Status status; //статус бронирования
+    private Status status; //статус бронирования
 }

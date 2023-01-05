@@ -8,6 +8,7 @@ import ru.practicum.shareit.booking.dto.BookingAddDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.State;
+import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.utils.Utils;
 
 import java.util.ArrayList;
@@ -23,14 +24,13 @@ public class BookingServiceImpl implements BookingService {
     private final Utils utils;
 
     @Override
-    public BookingAddDto addBooking(BookingAddDto bookingAddDto, Long bookerId) {
+    public BookingDto addBooking(BookingAddDto bookingAddDto, Long bookerId) {
         if (!utils.isUserExist(bookerId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND); //пользователь не существует
         }
         if (!utils.isItemExist(bookingAddDto.getItemId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND); //вещь не существует
         }
-        /*
         if (!utils.isItemAvailable(bookingAddDto.getItemId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //вещь не доступна для бронирования
         }
@@ -40,13 +40,11 @@ public class BookingServiceImpl implements BookingService {
         if (utils.getItemById(bookingAddDto.getItemId()).getOwner().getId().equals(bookerId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //бронировать свою вещь нельзя
         }
-
-         */
         Booking booking = BookingMapper.toBooking(bookingAddDto
                 , utils.getItemById(bookingAddDto.getItemId())
                 , utils.getUserById(bookerId));
         bookingRepository.save(booking);
-        return BookingMapper.toAddBookingDto(booking);
+        return BookingMapper.toBookingAddDto(booking);
     }
 
     @Override
@@ -65,7 +63,16 @@ public class BookingServiceImpl implements BookingService {
         if (!utils.isUserExist(userId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND); //пользователь не существует
         }
-        return null;
+        if (state == null) {
+            state = State.ALL;
+        }
+        List<Booking> outBookings = new ArrayList<>();
+        switch (state) {
+            case ALL:
+                outBookings = bookingRepository.findAllBookingsBybookerIdOrderByEndDesc(userId);
+                break;
+        }
+        return converterBookingToDto(outBookings);
     }
 
     @Override
@@ -89,11 +96,27 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto updateBookingByOwner(Long bookingId, Long ownerId, Boolean approved) {
-        return null;
+        if (!utils.isBookingExistById(bookingId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //бронирование не существует
+        }
+        if (!utils.isUserExist(ownerId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //пользователь не существует
+        }
+        if (approved == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //статус неверно передан
+        }
+        Booking booking = bookingRepository.findById(bookingId).get(); //TODO
+        if (approved.equals(Boolean.TRUE)) {
+            booking.setStatus(Status.APPROVED);
+            bookingRepository.save(booking);
+        } else {
+            booking.setStatus(Status.REJECTED);
+            bookingRepository.save(booking);
+        }
+        return BookingMapper.toBookingDto(booking);
     }
 
     private List<BookingDto> converterBookingToDto(List<Booking> bufferOutBooking) {
-        List<BookingDto> outBookingDto = new ArrayList<>();
         return bufferOutBooking.stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
