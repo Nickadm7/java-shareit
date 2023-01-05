@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.utils.Utils;
 
@@ -24,6 +25,17 @@ public class ItemServiceImpl implements ItemService {
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @Override
+    public CommentDto addComment(CommentDto commentDto, Long ownerId, Long itemId) {
+        if (itemId == null || ownerId == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        if (commentDto.getText().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //комментарий не может быть пустой
+        }
+        return null;
     }
 
     @Override

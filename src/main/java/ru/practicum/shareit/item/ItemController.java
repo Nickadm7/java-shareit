@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.utils.Utils;
 
@@ -23,11 +24,15 @@ public class ItemController {
     @PostMapping
     public ItemDto addItems(@Valid @RequestBody ItemDto itemDto, @RequestHeader(OWNER_ID) Long ownerId) {
         log.info("POST-запрос к эндпоинту /items owner_id: {}", ownerId);
-        if (utils.isUserExist(ownerId)) {
-            return itemService.addItem(itemDto, ownerId);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+        return itemService.addItem(itemDto, ownerId);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComments(@Valid @RequestBody CommentDto commentDto
+            , @RequestHeader(OWNER_ID) Long ownerId
+            , @PathVariable("itemId") Long itemId) {
+        log.info("POST-запрос к эндпоинту /{itemId}/comment:  владелец id:{} и вещь с id{}", ownerId, itemId);
+        return itemService.addComment(commentDto, ownerId, itemId);
     }
 
     @GetMapping
@@ -45,7 +50,7 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> findItemsByText(@RequestParam String text) {
         log.info("GET-запрос к эндпоинту /items/search найти: {}", text);
-        return itemService.findItemsByText  (text);
+        return itemService.findItemsByText(text);
     }
 
     @ResponseBody
@@ -65,4 +70,6 @@ public class ItemController {
         log.info("DELETE-запрос к эндпоинту /items удалить пользователя с id: {}", itemId);
         itemService.deleteById(itemId, ownerId);
     }
+
+
 }
