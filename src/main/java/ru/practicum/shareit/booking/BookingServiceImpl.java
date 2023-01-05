@@ -116,15 +116,44 @@ public class BookingServiceImpl implements BookingService {
         if (state == null) {
             state = ALL;
         }
-        List<Booking> bufferOutBooking = new ArrayList<>();
+        List<Booking> outBookings = new ArrayList<>();
+        List<Booking> bufferAllBookings = bookingRepository.findByItem_Owner_Id_OrderByEndDesc(ownerId);
         switch (state) {
             case ALL:
-                bufferOutBooking = bookingRepository.findAllBookingsBybookerIdOrderByEndDesc(ownerId);
+                outBookings = bookingRepository.findByItem_Owner_Id_OrderByEndDesc(ownerId);
+                break;
+            case CURRENT:
+                for (Booking booking : bufferAllBookings) {
+                    if (booking.getStart().isBefore(LocalDateTime.now())
+                            && booking.getEnd().isAfter(LocalDateTime.now())) {
+                        outBookings.add(booking);
+                    }
+                }
+                break;
+            case PAST:
+                for (Booking booking : bufferAllBookings) {
+                    if (booking.getEnd().isBefore(LocalDateTime.now())) {
+                        outBookings.add(booking);
+                    }
+                }
+                break;
+            case FUTURE:
+                for (Booking booking : bufferAllBookings) {
+                    if (booking.getEnd().isAfter(LocalDateTime.now())) {
+                        outBookings.add(booking);
+                    }
+                }
                 break;
             case WAITING:
+                outBookings = bookingRepository.findByItem_Owner_Id_AndStatusOrderByEndDesc(ownerId, Status.WAITING);
                 break;
+            case REJECTED:
+                outBookings = bookingRepository.findByItem_Owner_Id_AndStatusOrderByEndDesc(ownerId, Status.REJECTED);
+                break;
+            default:
+                throw new ValidationException("Unknown state: " + state); //такого статуса нет
         }
-        return converterBookingToDto(bufferOutBooking);
+        return converterBookingToDto(outBookings);
     }
 
     @Override
