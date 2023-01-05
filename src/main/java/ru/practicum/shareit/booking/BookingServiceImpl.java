@@ -9,13 +9,15 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.model.Status;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.utils.Utils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.practicum.shareit.booking.model.State.ALL;
+import static ru.practicum.shareit.booking.model.State.*;
 
 @Service
 @RequiredArgsConstructor
@@ -67,10 +69,41 @@ public class BookingServiceImpl implements BookingService {
             state = State.ALL;
         }
         List<Booking> outBookings = new ArrayList<>();
+        List<Booking> bufferAllBookings = bookingRepository.findAllBookingsBybookerIdOrderByEndDesc(userId);
         switch (state) {
             case ALL:
                 outBookings = bookingRepository.findAllBookingsBybookerIdOrderByEndDesc(userId);
                 break;
+            case CURRENT:
+                for (Booking booking : bufferAllBookings) {
+                    if (booking.getStart().isBefore(LocalDateTime.now())
+                            && booking.getEnd().isAfter(LocalDateTime.now())) {
+                        outBookings.add(booking);
+                    }
+                }
+                break;
+            case PAST:
+                for (Booking booking : bufferAllBookings) {
+                    if (booking.getEnd().isBefore(LocalDateTime.now())) {
+                        outBookings.add(booking);
+                    }
+                }
+                break;
+            case FUTURE:
+                for (Booking booking : bufferAllBookings) {
+                    if (booking.getEnd().isAfter(LocalDateTime.now())) {
+                        outBookings.add(booking);
+                    }
+                }
+                break;
+            case WAITING:
+                outBookings = bookingRepository.findAllBookingsByBookerIdAndStatusOrderByEndDesc(userId, Status.WAITING);
+                break;
+            case REJECTED:
+                outBookings = bookingRepository.findAllBookingsByBookerIdAndStatusOrderByEndDesc(userId, Status.REJECTED);
+                break;
+            default:
+                throw new ValidationException("Unknown state: " + state); //такого статуса нет
         }
         return converterBookingToDto(outBookings);
     }
