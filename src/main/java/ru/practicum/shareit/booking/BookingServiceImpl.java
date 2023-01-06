@@ -158,15 +158,24 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDto updateBookingByOwner(Long bookingId, Long ownerId, Boolean approved) {
+    public BookingDto updateBookingByOwner(Long bookingId, Long userId, Boolean approved) {
         if (!utils.isBookingExistById(bookingId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //бронирование не существует
         }
-        if (!utils.isUserExist(ownerId)) {
+        if (!utils.isUserExist(userId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //пользователь не существует
         }
         if (approved == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //статус неверно передан
+        }
+        Long ownerId = utils.getItemById(bookingRepository.findById(bookingId).get().getItem().getId())
+                .getOwner().getId();
+        if (!ownerId.equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //пользователь не владелец вещи
+        }
+        if (bookingRepository.findById(bookingId).get().getStatus().equals(Status.APPROVED)
+                && approved.equals(Boolean.TRUE)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //бронирование уже подтверждено
         }
         Booking booking = bookingRepository.findById(bookingId).get(); //TODO
         if (approved.equals(Boolean.TRUE)) {

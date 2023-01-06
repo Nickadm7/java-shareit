@@ -48,9 +48,9 @@ public class BookingController {
 
     @PatchMapping("/{bookingId}")
     public BookingDto updateBookingByOwner(@PathVariable Long bookingId
-            , @RequestHeader(OWNER_ID) Long ownerId
+            , @RequestHeader(OWNER_ID) Long userId
             , @RequestParam Boolean approved) {
         log.info("POST-запрос к эндпоинту /bookings/ обновление бронирования id: {}", bookingId);
-        return bookingService.updateBookingByOwner(bookingId, ownerId, approved);
+        return bookingService.updateBookingByOwner(bookingId, userId, approved);
     }
 }
