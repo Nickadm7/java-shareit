@@ -40,7 +40,7 @@ public class BookingServiceImpl implements BookingService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //старт бронирования после окончания
         }
         if (utils.getItemById(bookingAddDto.getItemId()).getOwner().getId().equals(bookerId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //бронировать свою вещь нельзя
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //бронировать свою вещь нельзя
         }
         Booking booking = BookingMapper.toBooking(bookingAddDto
                 , utils.getItemById(bookingAddDto.getItemId())
@@ -57,6 +57,7 @@ public class BookingServiceImpl implements BookingService {
         if (!utils.isUserExist(userId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND); //пользователь не существует
         }
+        utils.checkItemsToOwner(bookingId, userId);
         return BookingMapper.toBookingDto(bookingRepository.findById(bookingId).get()); //TODO
     }
 

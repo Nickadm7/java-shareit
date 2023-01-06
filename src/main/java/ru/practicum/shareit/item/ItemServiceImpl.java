@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.utils.Utils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
+    private final CommentRepository commentRepository;
     private final Utils utils;
 
     @Override
@@ -28,13 +32,29 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public CommentDto addComment(CommentDto commentDto, Long ownerId, Long itemId) {
-        if (itemId == null || ownerId == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    public CommentDto addComment(CommentDto commentDto, Long userId, Long itemId) {
+        if (itemId == null || userId == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //не найден id вещи или владельца
         }
         if (commentDto.getText().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //комментарий не может быть пустой
         }
+        List<Booking> bufferBookings = utils.findAllBookingsByBookerIdAndItemId(userId, itemId);
+        if  (bufferBookings == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //пользователь не арендовал вещь
+        }
+        /*
+        Comment comment = new Comment();
+        comment.setItem(utils.getItemById(itemId));
+        comment.setAuthor(utils.getUserById(userId));
+        comment.setText(commentDto.getText());
+        comment.setCreated(LocalDateTime.now());
+
+        commentRepository.save(comment);
+
+        return CommentMapper.toCommentDto(comment);
+
+         */
         return null;
     }
 
