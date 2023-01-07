@@ -61,7 +61,7 @@ public class Utils {
         return false;
     }
 
-    public List<Booking> findAllBookingsByBookerIdAndItemId(Long userId, Long itemId) {
-        return bookingRepository.findAllBookingsByBookerIdAndItemId(userId, itemId);
+    public List<Booking> findAllBookingsByBookerIdAndItemId(Long bookerId, Long itemId) {
+        return bookingRepository.findAllBookingsByBookerIdAndItemId(bookerId, itemId);
     }
 }

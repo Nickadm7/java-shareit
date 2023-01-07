@@ -2,8 +2,8 @@ package ru.practicum.shareit.item.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -12,7 +12,6 @@ import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class CommentDto {
 
@@ -23,5 +22,8 @@ public class CommentDto {
     @JsonIgnore
     private Item item; //вещь, к которой написан комментарий
     private User author; //пользователь, который написал комментарий
-    private LocalDateTime created;
+    @Builder.Default
+    private LocalDateTime created = LocalDateTime.now(); //время создания комментария
+
+
 }

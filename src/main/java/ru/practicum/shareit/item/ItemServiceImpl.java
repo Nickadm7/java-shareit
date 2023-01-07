@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.booking.model.Status;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.utils.Utils;
 
 import java.time.LocalDateTime;
@@ -32,7 +35,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public CommentDto addComment(CommentDto commentDto, Long userId, Long itemId) {
+    public CommentOutDto addComment(CommentDto commentDto, Long userId, Long itemId) {
         if (itemId == null || userId == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND); //не найден id вещи или владельца
         }
@@ -40,30 +43,49 @@ public class ItemServiceImpl implements ItemService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //комментарий не может быть пустой
         }
         List<Booking> bufferBookings = utils.findAllBookingsByBookerIdAndItemId(userId, itemId);
-        if  (bufferBookings == null) {
+        if (bufferBookings == null || bufferBookings.get(0).getStatus().equals(Status.REJECTED)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //пользователь не арендовал вещь
         }
-        /*
+        boolean isRequetGood = false;
+        for (Booking currentBooking : bufferBookings) {
+            if (currentBooking.getStatus().equals(Status.APPROVED)
+                    && currentBooking.getEnd().isBefore(LocalDateTime.now())) {
+                isRequetGood = true;
+                break;
+            }
+        }
+        if (!isRequetGood) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //статус не APPROVED или вещь еще бронируется
+        }
+
         Comment comment = new Comment();
         comment.setItem(utils.getItemById(itemId));
         comment.setAuthor(utils.getUserById(userId));
         comment.setText(commentDto.getText());
         comment.setCreated(LocalDateTime.now());
-
         commentRepository.save(comment);
+        return CommentMapper.toCommentOutDto(comment, userId);
 
-        return CommentMapper.toCommentDto(comment);
 
-         */
-        return null;
     }
 
     @Override
-    public ItemDto getItemById(Long itemId) {
-        if (itemRepository.findById(itemId).isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    public ItemOutForFindDto getItemById(Long itemId, Long userId) {
+        if (itemRepository.findById(itemId).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //вещь не найдена
         }
-        return ItemMapper.toItemDto(itemRepository.getReferenceById(itemId));
+        if (!utils.isUserExist(userId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //пользователь не существует
+        }
+        ItemOutForFindDto itemOutForFindDto = new ItemOutForFindDto();
+        Item item = itemRepository.getReferenceById(itemId);
+        List<Comment> currentComments = commentRepository.findAllByItemId(itemId);
+        if (item.getId().equals(userId)) {
+            itemOutForFindDto = ItemMapper.toItemOutForOwnerDto(item, converterCommentToOutDto(currentComments));
+        } else {
+            itemOutForFindDto = ItemMapper.toItemOutForOwnerDto(item, converterCommentToOutDto(currentComments));
+        }
+        return itemOutForFindDto;
     }
 
     @Override
@@ -115,5 +137,11 @@ public class ItemServiceImpl implements ItemService {
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    private List<CommentOutDto> converterCommentToOutDto(List<Comment> bufferOutComments) {
+        return bufferOutComments.stream()
+                .map(CommentMapper::toCommentOutForFindItemsDto)
+                .collect(Collectors.toList());
     }
 }

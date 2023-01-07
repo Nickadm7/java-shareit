@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentOutDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemOutForFindDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.utils.Utils;
 
@@ -29,11 +31,11 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto addComments(@Valid @RequestBody CommentDto commentDto
-            , @RequestHeader(OWNER_ID) Long ownerId
+    public CommentOutDto addComments(@Valid @RequestBody CommentDto commentDto
+            , @RequestHeader(OWNER_ID) Long userId
             , @PathVariable("itemId") Long itemId) {
-        log.info("POST-запрос к эндпоинту /{itemId}/comment:  владелец id:{} и вещь с id{}", ownerId, itemId);
-        return itemService.addComment(commentDto, ownerId, itemId);
+        log.info("POST-запрос к эндпоинту /{itemId}/comment:  владелец id:{} и вещь с id{}", userId, itemId);
+        return itemService.addComment(commentDto, userId, itemId);
     }
 
     @GetMapping
@@ -43,9 +45,9 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable Long itemId) {
+    public ItemOutForFindDto getItemById(@PathVariable Long itemId, @RequestHeader(OWNER_ID) Long userId) {
         log.info("GET-запрос к эндпоинту /items найти пользователя по id: {}", itemId);
-        return itemService.getItemById(itemId);
+        return itemService.getItemById(itemId, userId);
     }
 
     @GetMapping("/search")

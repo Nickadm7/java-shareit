@@ -29,5 +29,5 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "author_id")
     private User author; //пользователь, который написал комментарий
-    private LocalDateTime created;
+    private LocalDateTime created; //время создания комментария
 }
