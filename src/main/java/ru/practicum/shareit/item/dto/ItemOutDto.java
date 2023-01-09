@@ -26,4 +26,14 @@ public class ItemOutDto {
     private ItemRequest itemRequest; //если вещь была создана по запросу другого пользователя, то храним его
 
     private List<CommentDto> comments = new ArrayList<>(); //список комментариев к вещи
+
+    public ItemOutDto(Long id, String name, String description, Boolean available, User owner, ItemRequest itemRequest) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.available = available;
+        this.owner = owner;
+        this.itemRequest = itemRequest;
+        this.comments = new ArrayList<>();
+    }
 }

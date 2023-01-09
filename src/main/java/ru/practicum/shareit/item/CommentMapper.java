@@ -30,6 +30,7 @@ public class CommentMapper {
 
     public static CommentOutDto toCommentOutForFindItemsDto(Comment comment) {
         return new CommentOutDto(
+                comment.getId(),
                 comment.getText(),
                 comment.getAuthor().getName(),
                 comment.getCreated());

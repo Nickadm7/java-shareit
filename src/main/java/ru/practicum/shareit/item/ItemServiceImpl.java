@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import ru.practicum.shareit.booking.BookingMapper;
-import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.dto.*;
@@ -15,6 +13,7 @@ import ru.practicum.shareit.utils.Utils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,12 +77,18 @@ public class ItemServiceImpl implements ItemService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //пользователь не существует
         }
         ItemOutForFindDto itemOutForFindDto = new ItemOutForFindDto();
-        Item item = itemRepository.getReferenceById(itemId);
+        Item item = utils.getItemById(itemId);
         List<Comment> currentComments = commentRepository.findAllByItemId(itemId);
-        if (item.getId().equals(userId)) {
-            itemOutForFindDto = ItemMapper.toItemOutForOwnerDto(item, converterCommentToOutDto(currentComments));
+        if (item.getOwner().getId().equals(userId)) {
+            itemOutForFindDto = ItemMapper.toItemOutForOwnerDto(item
+                    , utils.getLastBooking(itemId)
+                    , utils.getNextBooking(itemId)
+                    , converterCommentToOutDto(currentComments));
         } else {
-            itemOutForFindDto = ItemMapper.toItemOutForOwnerDto(item, converterCommentToOutDto(currentComments));
+            itemOutForFindDto = ItemMapper.toItemOutForOwnerDto(item
+                    , null
+                    , null
+                    , converterCommentToOutDto(currentComments));
         }
         return itemOutForFindDto;
     }
@@ -100,9 +105,15 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> findItemsByOwnerId(Long ownerId) {
-        return itemRepository.findItemsByOwnerId(ownerId).stream()
-                .map(ItemMapper::toItemDto)
+    public List<ItemOutForFindDto> findItemsByUserId(Long userId) {
+        List<Item> items = itemRepository.findItemsByOwnerId(userId);
+        List<ItemOutForFindDto> outItems = new ArrayList<>();
+        items.forEach(item -> outItems.add(ItemMapper.toItemOutForOwnerDto(item
+                , utils.getLastBooking(item.getId())
+                , utils.getNextBooking(item.getId()),
+                null)));
+        return outItems.stream()
+                .sorted(Comparator.comparing(ItemOutForFindDto::getId))
                 .collect(Collectors.toList());
     }
 

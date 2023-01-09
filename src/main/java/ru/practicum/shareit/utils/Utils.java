@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.dto.BookingOutDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
@@ -12,6 +14,7 @@ import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -63,5 +66,15 @@ public class Utils {
 
     public List<Booking> findAllBookingsByBookerIdAndItemId(Long bookerId, Long itemId) {
         return bookingRepository.findAllBookingsByBookerIdAndItemId(bookerId, itemId);
+    }
+
+    public BookingOutDto getLastBooking(Long itemId) {
+        return BookingMapper.toBookingOutDto(bookingRepository.findFirstByItemIdAndEndBeforeOrderByEndDesc(itemId,
+                LocalDateTime.now()));
+    }
+
+    public BookingOutDto getNextBooking(Long itemId) {
+        return BookingMapper.toBookingOutDto(bookingRepository.findFirstByItemIdAndStartAfterOrderByStartAsc(itemId,
+                        LocalDateTime.now()));
     }
 }

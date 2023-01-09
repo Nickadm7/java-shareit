@@ -5,11 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.CommentOutDto;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemOutForFindDto;
-import ru.practicum.shareit.item.model.Comment;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.utils.Utils;
 
 import javax.validation.Valid;
@@ -39,9 +35,9 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> findItemsByOwnerId(@RequestHeader(OWNER_ID) Long ownerId) {
+    public List<ItemOutForFindDto> findItemsByUserId(@RequestHeader(OWNER_ID) Long userId) {
         log.info("GET-запрос к эндпоинту /items список всех вещей пользователя");
-        return itemService.findItemsByOwnerId(ownerId);
+        return itemService.findItemsByUserId(userId);
     }
 
     @GetMapping("/{itemId}")
