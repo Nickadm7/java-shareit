@@ -77,15 +77,15 @@ public class ItemServiceImpl implements ItemService {
         Item item = utils.getItemById(itemId);
         List<Comment> currentComments = commentRepository.findAllByItemId(itemId);
         if (item.getOwner().getId().equals(userId)) { //является ли пользователь владельцем вещи
-            itemOutForFindDto = ItemMapper.toItemOutForOwnerDto(item
-                    , utils.getLastBooking(itemId)
-                    , utils.getNextBooking(itemId)
-                    , converterCommentToOutDto(currentComments));
+            itemOutForFindDto = ItemMapper.toItemOutForOwnerDto(item,
+                    utils.getLastBooking(itemId),
+                    utils.getNextBooking(itemId),
+                    converterCommentToOutDto(currentComments));
         } else {
-            itemOutForFindDto = ItemMapper.toItemOutForOwnerDto(item
-                    , null
-                    , null
-                    , converterCommentToOutDto(currentComments));
+            itemOutForFindDto = ItemMapper.toItemOutForOwnerDto(item,
+                    null,
+                    null,
+                    converterCommentToOutDto(currentComments));
         }
         return itemOutForFindDto;
     }
@@ -105,13 +105,12 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemOutForFindDto> findItemsByUserId(Long userId) {
         List<Item> items = itemRepository.findItemsByOwnerId(userId);
         List<ItemOutForFindDto> outItems = new ArrayList<>();
-        items.forEach(item -> outItems.add(ItemMapper.toItemOutForOwnerDto(item
-                , utils.getLastBooking(item.getId())
-                , utils.getNextBooking(item.getId()),
+        items.forEach(item -> outItems.add(ItemMapper.toItemOutForOwnerDto(item,
+                utils.getLastBooking(item.getId()),
+                utils.getNextBooking(item.getId()),
                 null)));
         return outItems.stream()
-                .sorted(Comparator.comparing(ItemOutForFindDto::getId))
-                .collect(Collectors.toList());
+                .sorted(Comparator.comparing(ItemOutForFindDto::getId)).collect(Collectors.toList());
     }
 
     @Override

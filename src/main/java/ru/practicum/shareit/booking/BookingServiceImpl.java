@@ -42,9 +42,9 @@ public class BookingServiceImpl implements BookingService {
         if (utils.getItemById(bookingAddDto.getItemId()).getOwner().getId().equals(bookerId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND); //бронировать свою вещь нельзя
         }
-        Booking booking = BookingMapper.toBooking(bookingAddDto
-                , utils.getItemById(bookingAddDto.getItemId())
-                , utils.getUserById(bookerId));
+        Booking booking = BookingMapper.toBooking(bookingAddDto,
+                utils.getItemById(bookingAddDto.getItemId()),
+                utils.getUserById(bookerId));
         bookingRepository.save(booking);
         return BookingMapper.toBookingAddDto(booking);
     }

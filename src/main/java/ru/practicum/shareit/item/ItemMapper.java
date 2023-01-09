@@ -58,10 +58,10 @@ public class ItemMapper {
         );
     }
 
-    public static ItemOutForFindDto toItemOutForOwnerDto(Item item
-            , BookingOutDto lastBooking
-            , BookingOutDto nextBooking
-            , List<CommentOutDto> currentComments) {
+    public static ItemOutForFindDto toItemOutForOwnerDto(Item item,
+                                                         BookingOutDto lastBooking,
+                                                         BookingOutDto nextBooking,
+                                                         List<CommentOutDto> currentComments) {
         return new ItemOutForFindDto(
                 item.getId(),
                 item.getName(),

@@ -27,9 +27,9 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentOutDto addComments(@Valid @RequestBody CommentDto commentDto
-            , @RequestHeader(OWNER_ID) Long userId
-            , @PathVariable("itemId") Long itemId) {
+    public CommentOutDto addComments(@Valid @RequestBody CommentDto commentDto,
+                                     @RequestHeader(OWNER_ID) Long userId,
+                                     @PathVariable("itemId") Long itemId) {
         log.info("POST-запрос к эндпоинту /{itemId}/comment:  владелец id:{} и вещь с id{}", userId, itemId);
         return itemService.addComment(commentDto, userId, itemId);
     }
