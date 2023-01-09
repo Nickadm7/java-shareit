@@ -69,6 +69,4 @@ public class ItemController {
         log.info("DELETE-запрос к эндпоинту /items удалить пользователя с id: {}", itemId);
         itemService.deleteById(itemId, ownerId);
     }
-
-
 }

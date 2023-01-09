@@ -46,7 +46,7 @@ public class Utils {
     }
 
     public boolean isItemAvailable(Long itemId) {
-        return itemRepository.findById(itemId).get().getAvailable(); //TODO
+        return itemRepository.findById(itemId).get().getAvailable();
     }
 
     public boolean isBookingExistById(Long bookingId) {

@@ -37,7 +37,7 @@ public class BookingMapper {
 
     }
 
-    public static Booking toBooking(BookingDto bookingDto, User owner) { //TODO
+    public static Booking toBooking(BookingDto bookingDto, User owner) {
         return new Booking(
                 bookingDto.getId(),
                 bookingDto.getStart(),

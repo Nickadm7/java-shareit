@@ -58,7 +58,7 @@ public class BookingServiceImpl implements BookingService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND); //пользователь не существует
         }
         utils.checkItemsToOwner(bookingId, userId);
-        return BookingMapper.toBookingDto(bookingRepository.findById(bookingId).get()); //TODO
+        return BookingMapper.toBookingDto(bookingRepository.findById(bookingId).get());
     }
 
     @Override
@@ -70,10 +70,10 @@ public class BookingServiceImpl implements BookingService {
             state = State.ALL;
         }
         List<Booking> outBookings = new ArrayList<>();
-        List<Booking> bufferAllBookings = bookingRepository.findAllBookingsBybookerIdOrderByEndDesc(userId);
+        List<Booking> bufferAllBookings = bookingRepository.findAllBookings_BybookerId_OrderByEndDesc(userId);
         switch (state) {
             case ALL:
-                outBookings = bookingRepository.findAllBookingsBybookerIdOrderByEndDesc(userId);
+                outBookings = bookingRepository.findAllBookings_BybookerId_OrderByEndDesc(userId);
                 break;
             case CURRENT:
                 for (Booking booking : bufferAllBookings) {
@@ -98,10 +98,10 @@ public class BookingServiceImpl implements BookingService {
                 }
                 break;
             case WAITING:
-                outBookings = bookingRepository.findAllBookingsByBookerIdAndStatusOrderByEndDesc(userId, Status.WAITING);
+                outBookings = bookingRepository.findAllBookings_ByBookerIdAndStatus_OrderByEndDesc(userId, Status.WAITING);
                 break;
             case REJECTED:
-                outBookings = bookingRepository.findAllBookingsByBookerIdAndStatusOrderByEndDesc(userId, Status.REJECTED);
+                outBookings = bookingRepository.findAllBookings_ByBookerIdAndStatus_OrderByEndDesc(userId, Status.REJECTED);
                 break;
             default:
                 throw new ValidationException("Unknown state: " + state); //такого статуса нет
@@ -118,10 +118,10 @@ public class BookingServiceImpl implements BookingService {
             state = ALL;
         }
         List<Booking> outBookings = new ArrayList<>();
-        List<Booking> bufferAllBookings = bookingRepository.findByItem_Owner_Id_OrderByEndDesc(ownerId);
+        List<Booking> bufferAllBookings = bookingRepository.findByItem_OwnerId_OrderByEndDesc(ownerId);
         switch (state) {
             case ALL:
-                outBookings = bookingRepository.findByItem_Owner_Id_OrderByEndDesc(ownerId);
+                outBookings = bookingRepository.findByItem_OwnerId_OrderByEndDesc(ownerId);
                 break;
             case CURRENT:
                 for (Booking booking : bufferAllBookings) {
@@ -146,10 +146,10 @@ public class BookingServiceImpl implements BookingService {
                 }
                 break;
             case WAITING:
-                outBookings = bookingRepository.findByItem_Owner_Id_AndStatusOrderByEndDesc(ownerId, Status.WAITING);
+                outBookings = bookingRepository.findByItem_OwnerIdAndStatus_OrderByEndDesc(ownerId, Status.WAITING);
                 break;
             case REJECTED:
-                outBookings = bookingRepository.findByItem_Owner_Id_AndStatusOrderByEndDesc(ownerId, Status.REJECTED);
+                outBookings = bookingRepository.findByItem_OwnerIdAndStatus_OrderByEndDesc(ownerId, Status.REJECTED);
                 break;
             default:
                 throw new ValidationException("Unknown state: " + state); //такого статуса нет
@@ -177,7 +177,7 @@ public class BookingServiceImpl implements BookingService {
                 && approved.equals(Boolean.TRUE)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //бронирование уже подтверждено
         }
-        Booking booking = bookingRepository.findById(bookingId).get(); //TODO
+        Booking booking = bookingRepository.findById(bookingId).get();
         if (approved.equals(Boolean.TRUE)) {
             booking.setStatus(Status.APPROVED);
             bookingRepository.save(booking);
@@ -193,5 +193,4 @@ public class BookingServiceImpl implements BookingService {
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
-
 }

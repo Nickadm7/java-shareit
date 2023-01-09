@@ -8,7 +8,6 @@ import java.util.List;
 
 @Component
 public interface ItemStorage {
-
     Item addItem(Item item);
 
     List<Item> getAllItemsByOwner(Long ownerId);

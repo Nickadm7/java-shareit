@@ -56,7 +56,6 @@ public class ItemServiceImpl implements ItemService {
         if (!isRequetGood) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //статус не APPROVED или вещь еще бронируется
         }
-
         Comment comment = new Comment();
         comment.setItem(utils.getItemById(itemId));
         comment.setAuthor(utils.getUserById(userId));
@@ -64,8 +63,6 @@ public class ItemServiceImpl implements ItemService {
         comment.setCreated(LocalDateTime.now());
         commentRepository.save(comment);
         return CommentMapper.toCommentOutDto(comment, userId);
-
-
     }
 
     @Override
@@ -76,10 +73,10 @@ public class ItemServiceImpl implements ItemService {
         if (!utils.isUserExist(userId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //пользователь не существует
         }
-        ItemOutForFindDto itemOutForFindDto = new ItemOutForFindDto();
+        ItemOutForFindDto itemOutForFindDto;
         Item item = utils.getItemById(itemId);
         List<Comment> currentComments = commentRepository.findAllByItemId(itemId);
-        if (item.getOwner().getId().equals(userId)) {
+        if (item.getOwner().getId().equals(userId)) { //является ли пользователь владельцем вещи
             itemOutForFindDto = ItemMapper.toItemOutForOwnerDto(item
                     , utils.getLastBooking(itemId)
                     , utils.getNextBooking(itemId)

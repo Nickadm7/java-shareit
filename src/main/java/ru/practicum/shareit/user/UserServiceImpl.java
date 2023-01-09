@@ -49,10 +49,10 @@ public class UserServiceImpl implements UserService {
             userDto.setId(userId);
         }
         if (userDto.getName() == null) {
-            userDto.setName(userRepository.findById(userId).get().getName()); //TODO isPresent
+            userDto.setName(userRepository.findById(userId).get().getName());
         }
         if (userDto.getEmail() == null) {
-            userDto.setEmail(userRepository.findById(userId).get().getEmail()); //TODO isPresent
+            userDto.setEmail(userRepository.findById(userId).get().getEmail());
         } else {
             if (!checkUserEmail(userDto)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT);
