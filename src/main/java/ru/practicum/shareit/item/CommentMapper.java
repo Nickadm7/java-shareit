@@ -1,15 +1,14 @@
 package ru.practicum.shareit.item;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.CommentOutDto;
 import ru.practicum.shareit.item.model.Comment;
 
 @Component
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentMapper {
-    private final CommentRepository commentRepository;
-
     public static CommentOutDto toCommentOutDto(Comment comment, Long userId) {
         return new CommentOutDto(
                 userId,
