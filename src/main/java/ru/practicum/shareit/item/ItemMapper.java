@@ -1,15 +1,18 @@
 package ru.practicum.shareit.item;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.booking.dto.BookingOutDto;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-@Component
-public class ItemMapper {
-    private ItemMapper() {
-    }
+import java.util.List;
 
+@Component
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class ItemMapper {
     public static ItemDto toItemDto(Item item) {
         return new ItemDto(
                 item.getId(),
@@ -29,6 +32,44 @@ public class ItemMapper {
                 itemDto.getAvailable(),
                 owner,
                 itemDto.getItemRequest()
+        );
+    }
+
+    public static ItemOutDto toItemOutDto(Item item, List<CommentDto> comments) {
+        return new ItemOutDto(
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getAvailable(),
+                item.getOwner(),
+                item.getItemRequest(),
+                comments
+        );
+    }
+
+    public static ItemOutDto toAllItemOutDto(Item item) {
+        return new ItemOutDto(
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getAvailable(),
+                item.getOwner(),
+                item.getItemRequest()
+        );
+    }
+
+    public static ItemOutForFindDto toItemOutForOwnerDto(Item item,
+                                                         BookingOutDto lastBooking,
+                                                         BookingOutDto nextBooking,
+                                                         List<CommentOutDto> currentComments) {
+        return new ItemOutForFindDto(
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getAvailable(),
+                lastBooking,
+                nextBooking,
+                currentComments
         );
     }
 }

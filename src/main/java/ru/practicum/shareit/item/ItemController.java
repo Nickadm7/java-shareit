@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.utils.Utils;
 
 import javax.validation.Valid;
@@ -23,29 +23,33 @@ public class ItemController {
     @PostMapping
     public ItemDto addItems(@Valid @RequestBody ItemDto itemDto, @RequestHeader(OWNER_ID) Long ownerId) {
         log.info("POST-запрос к эндпоинту /items owner_id: {}", ownerId);
-        if (utils.isUserExist(ownerId)) {
-            return itemService.addItem(itemDto, ownerId);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+        return itemService.addItem(itemDto, ownerId);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentOutDto addComments(@Valid @RequestBody CommentDto commentDto,
+                                     @RequestHeader(OWNER_ID) Long userId,
+                                     @PathVariable("itemId") Long itemId) {
+        log.info("POST-запрос к эндпоинту /{itemId}/comment:  владелец id:{} и вещь с id{}", userId, itemId);
+        return itemService.addComment(commentDto, userId, itemId);
     }
 
     @GetMapping
-    public List<ItemDto> getAllItemsByOwner(@RequestHeader(OWNER_ID) Long ownerId) {
+    public List<ItemOutForFindDto> findItemsByUserId(@RequestHeader(OWNER_ID) Long userId) {
         log.info("GET-запрос к эндпоинту /items список всех вещей пользователя");
-        return itemService.getAllItemsByOwner(ownerId);
+        return itemService.findItemsByUserId(userId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable Long itemId) {
+    public ItemOutForFindDto getItemById(@PathVariable Long itemId, @RequestHeader(OWNER_ID) Long userId) {
         log.info("GET-запрос к эндпоинту /items найти пользователя по id: {}", itemId);
-        return itemService.getItemById(itemId);
+        return itemService.getItemById(itemId, userId);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItem(@RequestParam String text) {
+    public List<ItemDto> findItemsByText(@RequestParam String text) {
         log.info("GET-запрос к эндпоинту /items/search найти: {}", text);
-        return itemService.searchItem(text);
+        return itemService.findItemsByText(text);
     }
 
     @ResponseBody
