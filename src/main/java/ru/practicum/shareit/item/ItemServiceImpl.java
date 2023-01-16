@@ -27,9 +27,11 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto addItem(ItemDto itemDto, Long ownerId) {
         if (utils.isUserExist(ownerId)) {
-            return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto, utils.getUserById(ownerId))));
+            return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto,
+                    utils.getUserById(ownerId),
+                    utils.getItemRequestById(itemDto.getItemRequest()))));
         } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //пользователь не существует
         }
     }
 
@@ -131,7 +133,9 @@ public class ItemServiceImpl implements ItemService {
             itemDto.setAvailable(itemRepository.findById(itemId).get().getAvailable());
         }
         if ((itemRepository.findById(itemId).get().getOwner().getId()).equals(ownerId)) {
-            return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto, utils.getUserById(ownerId))));
+            return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto,
+                    utils.getUserById(ownerId),
+                    utils.getItemRequestById(itemDto.getItemRequest()))));
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }

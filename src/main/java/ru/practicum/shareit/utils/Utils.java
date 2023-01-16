@@ -10,6 +10,8 @@ import ru.practicum.shareit.booking.dto.BookingOutDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequestRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
@@ -24,6 +26,7 @@ public class Utils {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     public boolean isUserExist(Long ownerId) {
         return userService.getUserById(ownerId) != null;
@@ -35,6 +38,14 @@ public class Utils {
 
     public Item getItemById(Long itemId) {
         return itemRepository.getReferenceById(itemId);
+    }
+
+    public ItemRequest getItemRequestById(Long itemRequestId) {
+        if (itemRequestId != null) {
+            return itemRequestRepository.getReferenceById(itemRequestId);
+        } else {
+            return null;
+        }
     }
 
     public Booking getBookingById(Long bookingId) {
@@ -75,6 +86,6 @@ public class Utils {
 
     public BookingOutDto getNextBooking(Long itemId) {
         return BookingMapper.toBookingOutDto(bookingRepository.findFirstByItemIdAndStartAfterOrderByStartAsc(itemId,
-                        LocalDateTime.now()));
+                LocalDateTime.now()));
     }
 }

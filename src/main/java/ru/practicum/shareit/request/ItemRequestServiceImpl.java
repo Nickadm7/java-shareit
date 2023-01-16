@@ -4,12 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.utils.Utils;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,18 +20,22 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public ItemRequestDto addItemRequest(ItemRequestDto itemRequestDto, Long requestUserId, LocalDateTime created) {
-        ItemRequest itemRequest = ItemRequestMapper.toItemRequest(itemRequestDto,
-                utils.getUserById(requestUserId),
-                created);
-        ItemRequest outItemRequest = itemRequestRepository.save(itemRequest);
-        return ItemRequestMapper.toItemRequestDto(outItemRequest);
+        if (utils.isUserExist(requestUserId)) {
+            ItemRequest itemRequest = ItemRequestMapper.toItemRequest(itemRequestDto,
+                    utils.getUserById(requestUserId),
+                    created);
+            ItemRequest outItemRequest = itemRequestRepository.save(itemRequest);
+            return ItemRequestMapper.toItemRequestDto(outItemRequest);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //пользователь не существует
+        }
     }
 
     @Override
     public List<ItemRequestDto> findAllItemRequestsByOwnerId(Long ownerId) {
         utils.isUserExist(ownerId);
-        List<ItemRequest> bufferItemRequests = itemRequestRepository.findAllByRequestUserId_OrderByCreatedDesc(ownerId);
-        return bufferItemRequests.stream()
+        List<ItemRequest> outItemRequests = itemRequestRepository.findAllByRequestUserId_OrderByCreatedDesc(ownerId);
+        return outItemRequests.stream()
                 .map(ItemRequestMapper::toItemRequestDto)
                 .collect(Collectors.toList());
     }
