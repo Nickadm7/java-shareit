@@ -6,11 +6,8 @@ import lombok.NoArgsConstructor;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-item-requests.
- */
-//разработка в следующих спринтах
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,6 +21,8 @@ public class ItemRequest {
     private String description; //описание запроса
 
     @ManyToOne
-    @JoinColumn(name = "request_id", referencedColumnName = "id")
-    private User request; //
+    @JoinColumn(name = "requestuser_id", referencedColumnName = "id")
+    private User requestUser; //пользователь, который создает запрос
+
+    private LocalDateTime created; //когда был создан запрос
 }
