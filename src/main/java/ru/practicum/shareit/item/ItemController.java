@@ -2,9 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.utils.Utils;
 
@@ -57,11 +55,8 @@ public class ItemController {
     public ItemDto updateItem(@RequestBody ItemDto itemDto, @PathVariable Long itemId,
                               @RequestHeader(OWNER_ID) Long ownerId) {
         log.info("PATCH-запрос к эндпоинту /items обновить пользователя по id: {}", itemId);
-        if (utils.isUserExist(ownerId)) {
-            return itemService.updateItem(itemDto, itemId, ownerId);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+        utils.isUserExist(ownerId);
+        return itemService.updateItem(itemDto, itemId, ownerId);
     }
 
     @DeleteMapping("/{itemId}")

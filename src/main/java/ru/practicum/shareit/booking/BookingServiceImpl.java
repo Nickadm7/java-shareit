@@ -27,9 +27,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto addBooking(BookingAddDto bookingAddDto, Long bookerId) {
-        if (!utils.isUserExist(bookerId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //пользователь не существует
-        }
+        utils.isUserExist(bookerId);
         if (!utils.isItemExist(bookingAddDto.getItemId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND); //вещь не существует
         }
@@ -54,18 +52,14 @@ public class BookingServiceImpl implements BookingService {
         if (!utils.isBookingExistById(bookingId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND); //бронирование не существует
         }
-        if (!utils.isUserExist(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //пользователь не существует
-        }
+        utils.isUserExist(userId);
         utils.checkItemsToOwner(bookingId, userId);
         return BookingMapper.toBookingDto(bookingRepository.findById(bookingId).get());
     }
 
     @Override
     public List<BookingDto> getAllBookingsByUser(Long userId, State state) {
-        if (!utils.isUserExist(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //пользователь не существует
-        }
+        utils.isUserExist(userId);
         if (state == null) {
             state = State.ALL;
         }
@@ -111,9 +105,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getAllBookingsByOwner(Long ownerId, State state) {
-        if (!utils.isUserExist(ownerId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+        utils.isUserExist(ownerId); //проверка существует ли пользователь
         if (state == null) {
             state = ALL;
         }
@@ -162,9 +154,7 @@ public class BookingServiceImpl implements BookingService {
         if (!utils.isBookingExistById(bookingId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //бронирование не существует
         }
-        if (!utils.isUserExist(userId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //пользователь не существует
-        }
+        utils.isUserExist(userId);
         if (approved == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //статус неверно передан
         }

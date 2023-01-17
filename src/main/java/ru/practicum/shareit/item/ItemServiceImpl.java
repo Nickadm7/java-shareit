@@ -26,13 +26,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto addItem(ItemDto itemDto, Long ownerId) {
-        if (utils.isUserExist(ownerId)) {
-            return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto,
-                    utils.getUserById(ownerId),
-                    utils.getItemRequestById(itemDto.getRequestId()))));
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //пользователь не существует
-        }
+        utils.isUserExist(ownerId);
+        return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto,
+                utils.getUserById(ownerId),
+                utils.getItemRequestById(itemDto.getRequestId()))));
+
     }
 
     @Override
@@ -72,9 +70,7 @@ public class ItemServiceImpl implements ItemService {
         if (itemRepository.findById(itemId).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND); //вещь не найдена
         }
-        if (!utils.isUserExist(userId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //пользователь не существует
-        }
+        utils.isUserExist(userId);
         ItemOutForFindDto itemOutForFindDto;
         Item item = utils.getItemById(itemId);
         List<Comment> currentComments = commentRepository.findAllByItemId(itemId);

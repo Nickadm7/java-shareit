@@ -14,6 +14,7 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.utils.Utils;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,9 +26,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public ItemRequestDto addItemRequest(ItemRequestDto itemRequestDto, Long requestUserId, LocalDateTime created) {
-        if (!utils.isUserExist(requestUserId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //пользователь не существует
-        }
+        utils.isUserExist(requestUserId);
         ItemRequest itemRequest = ItemRequestMapper.toItemRequest(itemRequestDto,
                 utils.getUserById(requestUserId),
                 created);
@@ -38,42 +37,31 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public List<ItemRequestDto> findAllItemRequestsByOwnerId(Long ownerId) {
         utils.isUserExist(ownerId);
-        List<ItemRequest> outItemRequests = itemRequestRepository.findAllByRequestUserId_OrderByCreatedDesc(ownerId);
-        List<ItemRequestDto> requests = outItemRequests.stream()
-                .map(ItemRequestMapper::toItemRequestOutDto)
-                .collect(Collectors.toList());
-        requests.forEach(itemRequestDto -> itemRequestDto.setItems(utils.findItemsByRequestId(itemRequestDto.getId())
-                .stream()
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList())));
-        return requests;
+        List<ItemRequest> requests = itemRequestRepository.findAllByRequestUserId_OrderByCreatedDesc(ownerId);
+        List<ItemRequestDto> outRequests = itemRequestToItemRequestDto(requests);
+        return itemRequestDtoSetItem(outRequests);
     }
 
     @Override
     public List<ItemRequestDto> getAllItemRequests(Long userId, Integer from, Integer size) {
-        if (!utils.isUserExist(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //пользователь не существует
+        utils.isUserExist(userId);
+        if (size == null || from == null) { //параметры не определены, выводим все
+            List<ItemRequest> requestsAll = itemRequestRepository.findByRequestUserIdNot(userId);
+            List<ItemRequestDto> outRequestsAll = itemRequestToItemRequestDto(requestsAll);
+            if (outRequestsAll.isEmpty()) {
+                return Collections.emptyList();
+            }
+            return itemRequestDtoSetItem(outRequestsAll);
         }
-        if (from < 0 || size <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //не корректный запрос
-        }
-        List<ItemRequestDto> requests = itemRequestRepository.findByRequestUserIdNot(userId,
-                        PageRequest.of(from, size, Sort.by(Sort.Direction.DESC, "created")))
-                .stream()
-                .map(ItemRequestMapper::toItemRequestOutDto)
-                .collect(Collectors.toList());
-        requests.forEach(itemRequestDto -> itemRequestDto.setItems(utils.findItemsByRequestId(itemRequestDto.getId())
-                .stream()
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList())));
-        return requests;
+        PageRequest pageRequest = PageRequest.of(from, size, Sort.by(Sort.Direction.DESC, "created"));
+        List<ItemRequest> requests = itemRequestRepository.findByRequestUserIdNot(userId, pageRequest);
+        List<ItemRequestDto> outRequests = itemRequestToItemRequestDto(requests);
+        return itemRequestDtoSetItem(outRequests);
     }
 
     @Override
     public ItemRequestDto findItemRequestById(Long itemRequestId, Long userId) {
-        if (!utils.isUserExist(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //пользователь не существует
-        }
+        utils.isUserExist(userId);
         ItemRequest itemRequest = itemRequestRepository.findById(itemRequestId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         List<Item> bufferItems = utils.findItemsByRequestId(itemRequestId);
@@ -86,5 +74,18 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .collect(Collectors.toList());
     }
 
+    private List<ItemRequestDto> itemRequestDtoSetItem(List<ItemRequestDto> bufferItems) {
+        bufferItems.forEach(itemRequestDto -> itemRequestDto.setItems(utils.findItemsByRequestId(itemRequestDto.getId())
+                .stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList())));
+        return bufferItems;
+    }
 
+    private List<ItemRequestDto> itemRequestToItemRequestDto(List<ItemRequest> bufferItems) {
+        return bufferItems
+                .stream()
+                .map(ItemRequestMapper::toItemRequestOutDto)
+                .collect(Collectors.toList());
+    }
 }

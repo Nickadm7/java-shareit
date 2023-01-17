@@ -28,8 +28,10 @@ public class Utils {
     private final BookingRepository bookingRepository;
     private final ItemRequestRepository itemRequestRepository;
 
-    public boolean isUserExist(Long ownerId) {
-        return userService.getUserById(ownerId) != null;
+    public void isUserExist(Long ownerId) {
+        if (userService.getUserById(ownerId) == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //пользователь не существует
+        }
     }
 
     public User getUserById(Long userId) {
