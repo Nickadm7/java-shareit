@@ -25,5 +25,5 @@ public class ItemDto {
 
     private User owner; //владелец вещи
 
-    private Long itemRequest; //если вещь была создана по запросу другого пользователя, то храним его
+    private Long requestId; //если вещь была создана по запросу другого пользователя, то храним его
 }

@@ -48,6 +48,10 @@ public class Utils {
         }
     }
 
+    public List<Item> findItemsByRequestId(Long requestId) {
+        return itemRepository.findItemsByItemRequestId(requestId);
+    }
+
     public Booking getBookingById(Long bookingId) {
         return bookingRepository.getReferenceById(bookingId);
     }

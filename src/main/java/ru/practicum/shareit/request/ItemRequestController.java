@@ -3,9 +3,6 @@ package ru.practicum.shareit.request;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.booking.BookingService;
-import ru.practicum.shareit.booking.dto.BookingAddDto;
-import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 
 import javax.validation.Valid;

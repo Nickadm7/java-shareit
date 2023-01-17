@@ -29,7 +29,7 @@ public class ItemServiceImpl implements ItemService {
         if (utils.isUserExist(ownerId)) {
             return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto,
                     utils.getUserById(ownerId),
-                    utils.getItemRequestById(itemDto.getItemRequest()))));
+                    utils.getItemRequestById(itemDto.getRequestId()))));
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //пользователь не существует
         }
@@ -135,7 +135,7 @@ public class ItemServiceImpl implements ItemService {
         if ((itemRepository.findById(itemId).get().getOwner().getId()).equals(ownerId)) {
             return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto,
                     utils.getUserById(ownerId),
-                    utils.getItemRequestById(itemDto.getItemRequest()))));
+                    utils.getItemRequestById(itemDto.getRequestId()))));
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
