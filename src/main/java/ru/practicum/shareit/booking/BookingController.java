@@ -16,7 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping(path = "/bookings")
 public class BookingController {
-    private final Utils utils;
     private final BookingService bookingService;
     private static final String OWNER_ID = "X-Sharer-User-Id";
 
@@ -34,16 +33,20 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getAllBookingsByUser(@RequestParam(value = "state", required = false) State state,
-                                                 @RequestHeader(OWNER_ID) Long userId) {
+                                                 @RequestHeader(OWNER_ID) Long userId,
+                                                 @RequestParam(name = "from", required = false) Integer from,
+                                                 @RequestParam(name = "size", required = false) Integer size) {
         log.info("GET-запрос к эндпоинту /bookings все бронирования пользователя id: {}", userId);
-        return bookingService.getAllBookingsByUser(userId, state);
+        return bookingService.getAllBookingsByUser(userId, state, from, size);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getAllBookingsByOwner(@RequestParam(value = "state", required = false) State state,
-                                                  @RequestHeader(OWNER_ID) Long ownerId) {
+                                                  @RequestHeader(OWNER_ID) Long ownerId,
+                                                  @RequestParam(name = "from", required = false) Integer from,
+                                                  @RequestParam(name = "size", required = false) Integer size) {
         log.info("GET-запрос к эндпоинту /bookings/owner все бронирования пользователя id: {}", ownerId);
-        return bookingService.getAllBookingsByOwner(ownerId, state);
+        return bookingService.getAllBookingsByOwner(ownerId, state, from, size);
     }
 
     @PatchMapping("/{bookingId}")
