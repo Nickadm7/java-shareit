@@ -6,7 +6,6 @@ import ru.practicum.shareit.booking.dto.BookingAddDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import lombok.extern.slf4j.Slf4j;
 import ru.practicum.shareit.booking.model.State;
-import ru.practicum.shareit.utils.Utils;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -20,7 +19,7 @@ public class BookingController {
     private static final String OWNER_ID = "X-Sharer-User-Id";
 
     @PostMapping
-    public BookingDto bookingAddDto(@Valid @RequestBody BookingAddDto bookingAddDto, @RequestHeader(OWNER_ID) Long bookerId) {
+    public BookingDto addBooking(@Valid @RequestBody BookingAddDto bookingAddDto, @RequestHeader(OWNER_ID) Long bookerId) {
         log.info("POST-запрос к эндпоинту /bookings владелец id: {}", bookerId);
         return bookingService.addBooking(bookingAddDto, bookerId);
     }
