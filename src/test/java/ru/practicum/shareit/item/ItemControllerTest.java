@@ -55,8 +55,7 @@ public class ItemControllerTest {
             true,
             null,
             null,
-            null
-    );
+            null);
 
     @Test
     @DisplayName("Тест добавление вещи")
