@@ -18,6 +18,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.utils.Utils;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -125,5 +126,29 @@ public class BookingServiceTest {
         assertEquals(bookingDto.getStart(), actualBooking.getStart());
         assertEquals(bookingDto.getEnd(), actualBooking.getEnd());
         verify(bookingRepository, times(1)).save(any(Booking.class));
+    }
+
+    @Test
+    @DisplayName("Тест поиск бронирования по непровильному id")
+    void getBookingByWrongIdTest() {
+        Long bookingId = 1L;
+        when(bookingRepository.findById(bookingId))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        verify(bookingRepository, times(0)).findById(anyLong());
+    }
+
+    @Test
+    @DisplayName("Тест поиск бронирования по id")
+    void getBookingByIdTest() {
+        Long bookingId = 1L;
+        Long userId = 1L;
+        when(utils.isBookingExistById(bookingId)).thenReturn(true);
+        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+
+        BookingDto actualBooking = bookingService.getBookingById(bookingId, userId);
+
+        assertEquals(bookingDto, actualBooking);
+        verify(bookingRepository, times(1)).findById(anyLong());
     }
 }

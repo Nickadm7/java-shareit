@@ -70,6 +70,7 @@ public class BookingControllerTest {
         mapper.registerModule(new JavaTimeModule());
         when(bookingService.addBooking(any(), any(Long.class)))
                 .thenReturn(bookingDto);
+
         mockMvc.perform(post("/bookings")
                         .content(mapper.writeValueAsString(bookingAddDto))
                         .characterEncoding(StandardCharsets.UTF_8)

@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -67,7 +68,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Тест поиск пользователя по неверному id")
-    void getUserByIdTestWrongId() {
+    void getUserByIdTestWrongIdTest() {
         Long userId = 0L;
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
@@ -75,5 +76,20 @@ class UserServiceTest {
         assertThrows(ResponseStatusException.class,
                 () -> userService.getUserById(userId));
         verify(userRepository, atLeast(0)).findById(anyLong());
+    }
+
+    @Test
+    @DisplayName("Тест поиск всех пользователей")
+    void getAllUsersTest() {
+        User user = new User(1L, "userTestName", "mailtest@mail.ru");
+        when(userRepository.findAll())
+                .thenReturn(List.of(user));
+        List<UserDto> users = userService.getAllUsers();
+
+        assertEquals(1, users.size());
+        assertEquals(user.getId(), users.get(0).getId());
+        assertEquals(user.getName(), users.get(0).getName());
+        assertEquals(user.getEmail(), users.get(0).getEmail());
+        verify(userRepository, atLeast(1)).findAll();
     }
 }

@@ -11,7 +11,6 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.utils.Utils;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -53,6 +52,5 @@ class ItemServiceTest {
         assertEquals(itemDto.getDescription(), actualItemDto.getDescription());
         assertEquals(itemDto.getAvailable(), actualItemDto.getAvailable());
         assertEquals(itemDto, actualItemDto);
-
     }
 }

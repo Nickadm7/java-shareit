@@ -27,6 +27,4 @@ public class CommentDto {
 
     @Builder.Default
     private LocalDateTime created = LocalDateTime.now(); //время создания комментария
-
-
 }

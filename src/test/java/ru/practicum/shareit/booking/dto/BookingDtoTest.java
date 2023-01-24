@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.dto;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
-import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
@@ -22,7 +21,7 @@ public class BookingDtoTest {
 
     @Test
     @DisplayName("Тест BookingDto Json")
-    void userDtoTest() throws Exception {
+    void bookingDtoTest() throws Exception {
         LocalDateTime start = LocalDateTime.parse("2222-10-12T14:00");
         LocalDateTime end = LocalDateTime.parse("2222-12-12T14:00");
         User booker = new User(1L, "userName", "userDescription");
