@@ -15,7 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BookingAddDtoTest {
     @Autowired
     JacksonTester<BookingAddDto> json;
-
     @Test
     @DisplayName("Тест BookingAddDto Json")
     void bookingAddDtoTest() throws Exception {

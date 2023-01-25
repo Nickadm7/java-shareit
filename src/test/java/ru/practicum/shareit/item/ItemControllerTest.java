@@ -42,14 +42,12 @@ public class ItemControllerTest {
             true,
             null,
             null);
-
     private final ItemDto itemDtoWrongName = new ItemDto(1L,
             "",
             "TestDescription",
             true,
             null,
             null);
-
     private final ItemOutForFindDto itemOutForFindDto = new ItemOutForFindDto(1L,
             "ItemTestName",
             "TestDescription",
@@ -63,6 +61,7 @@ public class ItemControllerTest {
     void addItemsTest() throws Exception {
         when(itemService.addItem(any(), any(Long.class)))
                 .thenReturn(itemDto);
+
         mockMvc.perform(post("/items")
                         .content(mapper.writeValueAsString(itemDto))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -146,8 +145,4 @@ public class ItemControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
-
-
-
-
 }

@@ -40,4 +40,3 @@ public class CommentMapperTest {
         assert (actual.getCreated() != null);
     }
 }
-

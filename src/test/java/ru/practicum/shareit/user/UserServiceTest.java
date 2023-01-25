@@ -84,6 +84,7 @@ class UserServiceTest {
         User user = new User(1L, "userTestName", "mailtest@mail.ru");
         when(userRepository.findAll())
                 .thenReturn(List.of(user));
+
         List<UserDto> users = userService.getAllUsers();
 
         assertEquals(1, users.size());
@@ -103,7 +104,4 @@ class UserServiceTest {
 
         verify(userRepository, times(1)).save(any());
     }
-
-
-
 }

@@ -86,13 +86,11 @@ public class BookingServiceTest {
         when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
         when(bookingRepository.save(any())).thenReturn(booking);
 
-
         when(bookingRepository.save(booking))
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         assertThrows(ResponseStatusException.class,
                 () -> bookingService.addBooking(BookingMapper.toAddBookingDto(booking), 1L));
-
     }
 
     @Test
@@ -195,6 +193,4 @@ public class BookingServiceTest {
         assertEquals(booking.getStatus(), actual.get(0).getStatus());
         assertEquals(booking.getStart(), actual.get(0).getStart());
     }
-
-
 }

@@ -48,7 +48,6 @@ public class BookingControllerTest {
             true,
             owner,
             null);
-
     BookingAddDto bookingAddDto = new BookingAddDto(1L,
             1L,
             start,
@@ -57,7 +56,6 @@ public class BookingControllerTest {
             1L,
             wrongStart,
             end);
-
     BookingDto bookingDto = new BookingDto(1L,
             start,
             end,
@@ -70,6 +68,7 @@ public class BookingControllerTest {
     @DisplayName("Тест добавление бронирования")
     void addBookingTest() throws Exception {
         mapper.registerModule(new JavaTimeModule());
+
         when(bookingService.addBooking(any(), any(Long.class)))
                 .thenReturn(bookingDto);
 
@@ -92,8 +91,10 @@ public class BookingControllerTest {
     @DisplayName("Тест добавление бронирования неверная дата начала")
     void addBookingWrongStartTest() throws Exception {
         mapper.registerModule(new JavaTimeModule());
+
         when(bookingService.addBooking(any(), any(Long.class)))
                 .thenReturn(bookingDto);
+
         mockMvc.perform(post("/bookings")
                         .content(mapper.writeValueAsString(bookingAddDtoWrongStart))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -107,6 +108,7 @@ public class BookingControllerTest {
     @DisplayName("Тест получение бронирования по id")
     void getBookingByIdTest() throws Exception {
         mapper.registerModule(new JavaTimeModule());
+
         when(bookingService.getBookingById(any(Long.class), any(Long.class)))
                 .thenReturn(bookingDto);
 
@@ -130,7 +132,8 @@ public class BookingControllerTest {
     @DisplayName("Тест получение всех бронирований пользователя")
     void getAllBookingsByUserTest() throws Exception {
         mapper.registerModule(new JavaTimeModule());
-        when(bookingService.getAllBookingsByUser(any(Long.class), any(),any(),any()))
+
+        when(bookingService.getAllBookingsByUser(any(Long.class), any(), any(), any()))
                 .thenReturn(List.of(bookingDto));
 
         mockMvc.perform(get("/bookings")
@@ -146,7 +149,8 @@ public class BookingControllerTest {
     @DisplayName("Тест получение всех бронирований владельца")
     void getAllBookingsByOwnerTest() throws Exception {
         mapper.registerModule(new JavaTimeModule());
-        when(bookingService.getAllBookingsByOwner(anyLong(),any(), anyInt(),anyInt()))
+
+        when(bookingService.getAllBookingsByOwner(anyLong(), any(), anyInt(), anyInt()))
                 .thenReturn(List.of(bookingDto));
 
         mockMvc.perform(get("/bookings/owner")
@@ -162,7 +166,8 @@ public class BookingControllerTest {
     @DisplayName("Тест получение всех бронирований владельца")
     void updateBookingByOwnerTest() throws Exception {
         mapper.registerModule(new JavaTimeModule());
-        when(bookingService.updateBookingByOwner(anyLong(),anyLong(),any()))
+
+        when(bookingService.updateBookingByOwner(anyLong(), anyLong(), any()))
                 .thenReturn(bookingDto);
 
         mockMvc.perform(get("/bookings/1")
@@ -173,6 +178,4 @@ public class BookingControllerTest {
                         .header(OWNER_ID, 1))
                 .andExpect(status().isOk());
     }
-
-
 }

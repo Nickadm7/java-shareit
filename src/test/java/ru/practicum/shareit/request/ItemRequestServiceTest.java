@@ -30,10 +30,10 @@ public class ItemRequestServiceTest {
     ItemRequestServiceImpl itemRequestService;
 
     ItemRequestDto itemRequestDto = new ItemRequestDto(
-                1L,
-                        "testDescription",
-                LocalDateTime.now(),
-                List.of());
+            1L,
+            "testDescription",
+            LocalDateTime.now(),
+            List.of());
     ItemRequest itemRequest = new ItemRequest(
             1L,
             "testDescription",
@@ -71,6 +71,4 @@ public class ItemRequestServiceTest {
 
         verify(itemRequestRepository, times(1)).findById(any());
     }
-
-
 }

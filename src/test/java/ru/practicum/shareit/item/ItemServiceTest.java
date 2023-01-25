@@ -78,6 +78,4 @@ class ItemServiceTest {
 
         verify(itemRepository, times(1)).findItemsByOwnerId(anyLong());
     }
-
-
 }
