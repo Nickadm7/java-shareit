@@ -37,17 +37,6 @@ public class BookingMapper {
 
     }
 
-    public static Booking toBooking(BookingDto bookingDto, User owner) {
-        return new Booking(
-                bookingDto.getId(),
-                bookingDto.getStart(),
-                bookingDto.getEnd(),
-                bookingDto.getItem(),
-                bookingDto.getBooker(),
-                bookingDto.getStatus()
-        );
-    }
-
     public static Booking toBooking(BookingAddDto bookingAddDto, Item item, User owner) {
         Booking booking = new Booking();
         booking.setStart(bookingAddDto.getStart());

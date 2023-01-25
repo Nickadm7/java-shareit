@@ -15,15 +15,16 @@ import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = BookingController.class)
@@ -32,6 +33,8 @@ public class BookingControllerTest {
     private MockMvc mockMvc;
     @MockBean
     private BookingService bookingService;
+    @MockBean
+    private BookingRepository bookingRepository;
     private final ObjectMapper mapper = new ObjectMapper();
     private static final String OWNER_ID = "X-Sharer-User-Id";
     LocalDateTime start = LocalDateTime.parse("2222-10-12T14:00");
@@ -50,7 +53,6 @@ public class BookingControllerTest {
             1L,
             start,
             end);
-
     BookingAddDto bookingAddDtoWrongStart = new BookingAddDto(1L,
             1L,
             wrongStart,
@@ -62,7 +64,7 @@ public class BookingControllerTest {
             item,
             booker,
             Status.APPROVED
-            );
+    );
 
     @Test
     @DisplayName("Тест добавление бронирования")
@@ -123,4 +125,54 @@ public class BookingControllerTest {
                         is(bookingDto.getEnd().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))))
                 .andExpect(jsonPath("$.status", is(bookingDto.getStatus().toString()), Status.class));
     }
+
+    @Test
+    @DisplayName("Тест получение всех бронирований пользователя")
+    void getAllBookingsByUserTest() throws Exception {
+        mapper.registerModule(new JavaTimeModule());
+        when(bookingService.getAllBookingsByUser(any(Long.class), any(),any(),any()))
+                .thenReturn(List.of(bookingDto));
+
+        mockMvc.perform(get("/bookings")
+                        .content(mapper.writeValueAsString(bookingAddDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(OWNER_ID, 1))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Тест получение всех бронирований владельца")
+    void getAllBookingsByOwnerTest() throws Exception {
+        mapper.registerModule(new JavaTimeModule());
+        when(bookingService.getAllBookingsByOwner(anyLong(),any(), anyInt(),anyInt()))
+                .thenReturn(List.of(bookingDto));
+
+        mockMvc.perform(get("/bookings/owner")
+                        .content(mapper.writeValueAsString(bookingAddDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(OWNER_ID, 1))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Тест получение всех бронирований владельца")
+    void updateBookingByOwnerTest() throws Exception {
+        mapper.registerModule(new JavaTimeModule());
+        when(bookingService.updateBookingByOwner(anyLong(),anyLong(),any()))
+                .thenReturn(bookingDto);
+
+        mockMvc.perform(get("/bookings/1")
+                        .content(mapper.writeValueAsString(bookingAddDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(OWNER_ID, 1))
+                .andExpect(status().isOk());
+    }
+
+
 }

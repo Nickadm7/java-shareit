@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
@@ -27,6 +29,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto addItem(ItemDto itemDto, Long ownerId) {
         utils.isUserExist(ownerId);
+        log.info("Вещь успешно добавлена");
         return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto,
                 utils.getUserById(ownerId),
                 utils.getItemRequestById(itemDto.getRequestId()))));

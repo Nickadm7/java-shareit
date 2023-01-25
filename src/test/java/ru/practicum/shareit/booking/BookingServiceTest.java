@@ -3,11 +3,11 @@ package ru.practicum.shareit.booking;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemOutForFindDto;
@@ -18,6 +18,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.utils.Utils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -151,4 +152,49 @@ public class BookingServiceTest {
         assertEquals(bookingDto, actualBooking);
         verify(bookingRepository, times(1)).findById(anyLong());
     }
+
+    @Test
+    @DisplayName("Тест все бронирования пользователя неправильная пагинация 0 и 0")
+    void getAllBookingsByUserWrongPaginationTest() {
+        assertThrows(ResponseStatusException.class,
+                () -> bookingService.getAllBookingsByUser(1L, State.CURRENT, 0, 0));
+    }
+
+    @Test
+    @DisplayName("Тест все бронирования пользователя неправильная пагинация -1 и 0")
+    void getAllBookingsByUserWrongPaginationTest1() {
+        assertThrows(ResponseStatusException.class,
+                () -> bookingService.getAllBookingsByUser(1L, State.CURRENT, -1, 0));
+    }
+
+    @Test
+    @DisplayName("Тест все бронирования владельца неправильная пагинация 0 и 0")
+    void getAllBookingsByOwnerTest() {
+        assertThrows(ResponseStatusException.class,
+                () -> bookingService.getAllBookingsByOwner(1L, State.CURRENT, 0, 0));
+    }
+
+    @Test
+    @DisplayName("Тест все бронирования владельца неправильная пагинация 0 и 0")
+    void getAllBookingsByOwnerTest1() {
+        assertThrows(ResponseStatusException.class,
+                () -> bookingService.getAllBookingsByOwner(1L, State.CURRENT, -1, 0));
+    }
+
+    @Test
+    @DisplayName("Тест все бронирования владельца статус ALL")
+    void getAllBookingsByOwner_ALL_Test() {
+        List<Booking> bufferBooking = List.of(booking);
+        when(bookingRepository.findByItem_OwnerId_OrderByEndDesc(anyLong(), any()))
+                .thenReturn(bufferBooking);
+
+        List<BookingDto> actual = bookingService.getAllBookingsByOwner(1L, State.ALL, 1, 2);
+
+        assertNotNull(actual);
+        assertEquals(booking.getId(), actual.get(0).getId());
+        assertEquals(booking.getStatus(), actual.get(0).getStatus());
+        assertEquals(booking.getStart(), actual.get(0).getStart());
+    }
+
+
 }

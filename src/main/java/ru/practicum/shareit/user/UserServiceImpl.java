@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
@@ -18,8 +20,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto addUser(UserDto userDto) {
         if (userDto.getEmail() != null) {
+            log.info("Пользователь успешно добавлен");
             return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
         } else {
+            log.info("Не корректны email пользователя при добавлении");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
     }
@@ -27,6 +31,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUserById(Long userId) {
         if (userRepository.findById(userId).isEmpty()) {
+            log.info("Пользователь не найден по id");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         } else {
             return UserMapper.toUserDto(userRepository.findById(userId).get());
@@ -43,6 +48,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(UserDto userDto, Long userId) {
         if (userId == null) {
+            log.info("Пользователь не найден по id");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         if (userDto.getId() == null) {

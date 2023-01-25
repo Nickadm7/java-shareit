@@ -64,68 +64,25 @@ public class BookingServiceImpl implements BookingService {
         if (state == null) {
             state = State.ALL;
         }
+        List<Booking> outBookings = new ArrayList<>();
+        List<Booking> bufferAllBookings;
         if (from == null || size == null) {
-            return getAllBookingsByUserNoPagination(userId, state);
-        }
-        return getAllBookingsByUserWithPagination(userId, state, from, size);
-    }
+            bufferAllBookings = bookingRepository.findAllBookings_BybookerId_OrderByEndDesc(userId);
 
-    @Override
-    public List<BookingDto> getAllBookingsByUserNoPagination(Long userId, State state) {
-        List<Booking> outBookings = new ArrayList<>();
-        List<Booking> bufferAllBookings = bookingRepository.findAllBookings_BybookerId_OrderByEndDesc(userId);
+        } else {
+            if (from == 0 && size == 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //не корректные параметры пагинации
+            }
+            if (from < 0 || size < 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //не корректные параметры пагинации
+            }
+            PageRequest pageRequest = PageRequest.of(from / size, size);
+            bufferAllBookings = bookingRepository.findAllBookings_BybookerId_OrderByEndDesc(userId, pageRequest);
+
+        }
         switch (state) {
             case ALL:
-                outBookings = bookingRepository.findAllBookings_BybookerId_OrderByEndDesc(userId);
-                break;
-            case CURRENT:
-                for (Booking booking : bufferAllBookings) {
-                    if (booking.getStart().isBefore(LocalDateTime.now())
-                            && booking.getEnd().isAfter(LocalDateTime.now())) {
-                        outBookings.add(booking);
-                    }
-                }
-                break;
-            case PAST:
-                for (Booking booking : bufferAllBookings) {
-                    if (booking.getEnd().isBefore(LocalDateTime.now())) {
-                        outBookings.add(booking);
-                    }
-                }
-                break;
-            case FUTURE:
-                for (Booking booking : bufferAllBookings) {
-                    if (booking.getEnd().isAfter(LocalDateTime.now())) {
-                        outBookings.add(booking);
-                    }
-                }
-                break;
-            case WAITING:
-                outBookings = bookingRepository.findAllBookings_ByBookerIdAndStatus_OrderByEndDesc(userId, Status.WAITING);
-                break;
-            case REJECTED:
-                outBookings = bookingRepository.findAllBookings_ByBookerIdAndStatus_OrderByEndDesc(userId, Status.REJECTED);
-                break;
-            default:
-                throw new ValidationException("Unknown state: " + state); //такого статуса нет
-        }
-        return converterBookingToDto(outBookings);
-    }
-
-    @Override
-    public List<BookingDto> getAllBookingsByUserWithPagination(Long userId, State state, Integer from, Integer size) {
-        if (from == 0 && size == 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //не корректные параметры пагинации
-        }
-        if (from < 0 || size < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //не корректные параметры пагинации
-        }
-        List<Booking> outBookings = new ArrayList<>();
-        PageRequest pageRequest = PageRequest.of(from / size, size);
-        List<Booking> bufferAllBookings = bookingRepository.findAllBookings_BybookerId_OrderByEndDesc(userId, pageRequest);
-        switch (state) {
-            case ALL:
-                outBookings = bookingRepository.findAllBookings_BybookerId_OrderByEndDesc(userId, pageRequest);
+                outBookings = bufferAllBookings;
                 break;
             case CURRENT:
                 for (Booking booking : bufferAllBookings) {
@@ -167,69 +124,23 @@ public class BookingServiceImpl implements BookingService {
         if (state == null) {
             state = ALL;
         }
+        List<Booking> outBookings = new ArrayList<>();
+        List<Booking> bufferAllBookings;
         if (from == null || size == null) {
-            return getAllBookingsByOwnerNoPagination(ownerId, state);
+            bufferAllBookings = bookingRepository.findByItem_OwnerId_OrderByEndDesc(ownerId);
         } else {
-            return getAllBookingsByOwnerWithPagination(ownerId, state, from, size);
+            if (from == 0 && size == 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //не корректные параметры пагинации
+            }
+            if (from < 0 || size < 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //не корректные параметры пагинации
+            }
+            PageRequest pageRequest = PageRequest.of(from / size, size);
+            bufferAllBookings = bookingRepository.findByItem_OwnerId_OrderByEndDesc(ownerId, pageRequest);
         }
-    }
-
-    @Override
-    public List<BookingDto> getAllBookingsByOwnerNoPagination(Long ownerId, State state) {
-        List<Booking> outBookings = new ArrayList<>();
-        List<Booking> bufferAllBookings = bookingRepository.findByItem_OwnerId_OrderByEndDesc(ownerId);
         switch (state) {
             case ALL:
-                outBookings = bookingRepository.findByItem_OwnerId_OrderByEndDesc(ownerId);
-                break;
-            case CURRENT:
-                for (Booking booking : bufferAllBookings) {
-                    if (booking.getStart().isBefore(LocalDateTime.now())
-                            && booking.getEnd().isAfter(LocalDateTime.now())) {
-                        outBookings.add(booking);
-                    }
-                }
-                break;
-            case PAST:
-                for (Booking booking : bufferAllBookings) {
-                    if (booking.getEnd().isBefore(LocalDateTime.now())) {
-                        outBookings.add(booking);
-                    }
-                }
-                break;
-            case FUTURE:
-                for (Booking booking : bufferAllBookings) {
-                    if (booking.getEnd().isAfter(LocalDateTime.now())) {
-                        outBookings.add(booking);
-                    }
-                }
-                break;
-            case WAITING:
-                outBookings = bookingRepository.findByItem_OwnerIdAndStatus_OrderByEndDesc(ownerId, Status.WAITING);
-                break;
-            case REJECTED:
-                outBookings = bookingRepository.findByItem_OwnerIdAndStatus_OrderByEndDesc(ownerId, Status.REJECTED);
-                break;
-            default:
-                throw new ValidationException("Unknown state: " + state); //такого статуса нет
-        }
-        return converterBookingToDto(outBookings);
-    }
-
-    @Override
-    public List<BookingDto> getAllBookingsByOwnerWithPagination(Long ownerId, State state, Integer from, Integer size) {
-        if (from == 0 && size == 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //не корректные параметры пагинации
-        }
-        if (from < 0 || size < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //не корректные параметры пагинации
-        }
-        List<Booking> outBookings = new ArrayList<>();
-        PageRequest pageRequest = PageRequest.of(from / size, size);
-        List<Booking> bufferAllBookings = bookingRepository.findByItem_OwnerId_OrderByEndDesc(ownerId, pageRequest);
-        switch (state) {
-            case ALL:
-                outBookings = bookingRepository.findByItem_OwnerId_OrderByEndDesc(ownerId, pageRequest);
+                outBookings = bufferAllBookings;
                 break;
             case CURRENT:
                 for (Booking booking : bufferAllBookings) {

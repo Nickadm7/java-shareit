@@ -92,4 +92,18 @@ class UserServiceTest {
         assertEquals(user.getEmail(), users.get(0).getEmail());
         verify(userRepository, atLeast(1)).findAll();
     }
+
+    @Test
+    @DisplayName("Тест обновление пользователя")
+    void updateUserTest() {
+        when(userRepository.save(any(User.class)))
+                .thenReturn(new User());
+
+        userService.updateUser((new UserDto(1L, "userTestName", "mailtest@mail.ru")), 1L);
+
+        verify(userRepository, times(1)).save(any());
+    }
+
+
+
 }

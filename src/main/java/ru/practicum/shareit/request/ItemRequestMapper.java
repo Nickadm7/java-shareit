@@ -1,18 +1,18 @@
 package ru.practicum.shareit.request;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
-import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.user.dto.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Data
+//        @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemRequestMapper {
     public static ItemRequest toItemRequest(ItemRequestDto itemRequestDto, User requestUser, LocalDateTime created) {
             ItemRequest itemRequest = new ItemRequest();

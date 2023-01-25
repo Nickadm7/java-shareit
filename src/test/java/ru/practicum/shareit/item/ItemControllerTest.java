@@ -14,6 +14,7 @@ import ru.practicum.shareit.utils.Utils;
 
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -92,6 +93,7 @@ public class ItemControllerTest {
     void getItemByIdTest() throws Exception {
         when(itemService.getItemById(any(Long.class), any(Long.class)))
                 .thenReturn(itemOutForFindDto);
+
         mockMvc.perform(get("/items/1")
                         .content(mapper.writeValueAsString(itemDto))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -113,5 +115,39 @@ public class ItemControllerTest {
                         .header(OWNER_ID, 1))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("Тест поиск вещей по id пользователя")
+    void findItemsByUserIdTest() throws Exception {
+        when(itemService.findItemsByUserId(anyLong()))
+                .thenReturn(List.of(itemOutForFindDto));
+
+        mockMvc.perform(get("/items/")
+                        .content(mapper.writeValueAsString(itemDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(OWNER_ID, 1))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Тест поиск вещей по тексту")
+    void findItemsByTest() throws Exception {
+        when(itemService.findItemsByText("text"))
+                .thenReturn(List.of(itemDto));
+
+        mockMvc.perform(get("/items/search")
+                        .content(mapper.writeValueAsString(itemDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .header(OWNER_ID, 1L)
+                        .queryParam("text", "test")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+
+
 
 }

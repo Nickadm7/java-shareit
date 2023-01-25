@@ -11,7 +11,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.ItemRequestRepository;
-import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.user.dto.model.ItemRequest;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
@@ -52,10 +52,6 @@ public class Utils {
 
     public List<Item> findItemsByRequestId(Long requestId) {
         return itemRepository.findItemsByItemRequestId(requestId);
-    }
-
-    public Booking getBookingById(Long bookingId) {
-        return bookingRepository.getReferenceById(bookingId);
     }
 
     public boolean isItemExist(Long itemId) {

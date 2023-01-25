@@ -7,9 +7,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemOutForFindDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.utils.Utils;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -18,6 +21,8 @@ import static org.mockito.Mockito.*;
 class ItemServiceTest {
     @Mock
     private ItemRepository itemRepository;
+    @Mock
+    private CommentRepository commentRepository;
     @Mock
     private Utils utils;
     @InjectMocks
@@ -53,4 +58,26 @@ class ItemServiceTest {
         assertEquals(itemDto.getAvailable(), actualItemDto.getAvailable());
         assertEquals(itemDto, actualItemDto);
     }
+
+    @Test
+    @DisplayName("Тест поиск вещи по тексту")
+    void findItemsByTextTest() {
+        when(itemRepository.findItemsByText(anyString())).thenReturn(List.of(item));
+
+        List<ItemDto> actualItem= itemService.findItemsByText("text");
+
+        verify(itemRepository, times(1)).findItemsByText(anyString());
+    }
+
+    @Test
+    @DisplayName("Тест поиск вещи по id пользователя")
+    void findItemsByUserIdTest() {
+        when(itemRepository.findItemsByOwnerId(anyLong())).thenReturn(List.of(item));
+
+        List<ItemOutForFindDto> actualItem= itemService.findItemsByUserId(1L);
+
+        verify(itemRepository, times(1)).findItemsByOwnerId(anyLong());
+    }
+
+
 }
