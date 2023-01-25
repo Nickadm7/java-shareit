@@ -64,7 +64,7 @@ class ItemServiceTest {
     void findItemsByTextTest() {
         when(itemRepository.findItemsByText(anyString())).thenReturn(List.of(item));
 
-        List<ItemDto> actualItem= itemService.findItemsByText("text");
+        List<ItemDto> actualItem = itemService.findItemsByText("text");
 
         verify(itemRepository, times(1)).findItemsByText(anyString());
     }
@@ -74,7 +74,7 @@ class ItemServiceTest {
     void findItemsByUserIdTest() {
         when(itemRepository.findItemsByOwnerId(anyLong())).thenReturn(List.of(item));
 
-        List<ItemOutForFindDto> actualItem= itemService.findItemsByUserId(1L);
+        List<ItemOutForFindDto> actualItem = itemService.findItemsByUserId(1L);
 
         verify(itemRepository, times(1)).findItemsByOwnerId(anyLong());
     }

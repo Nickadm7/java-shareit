@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ItemRequestService {
-    ItemRequestDto addItemRequest (ItemRequestDto itemRequestDto, Long requestUserId, LocalDateTime created);
+    ItemRequestDto addItemRequest(ItemRequestDto itemRequestDto, Long requestUserId, LocalDateTime created);
 
     List<ItemRequestDto> findAllItemRequestsByOwnerId(Long ownerId);
 
