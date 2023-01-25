@@ -39,7 +39,7 @@ public class BookingMapperTest {
 
         assertEquals(3, actual.getId());
         assertEquals(1, actual.getBookerId());
-        assert(actual.getStartTime() != null);
-        assert(actual.getEndTime() != null);
+        assert (actual.getStartTime() != null);
+        assert (actual.getEndTime() != null);
     }
 }
