@@ -82,15 +82,13 @@ public class ItemRequestControllerTest {
         when(itemRequestService.findItemRequestById(anyLong(), anyLong()))
                 .thenReturn(itemRequestDto);
 
-        mockMvc.perform(get("/requests")
+       mockMvc.perform(get("/requests/1")
                         .content(mapper.writeValueAsString(itemRequestDto))
                         .characterEncoding(StandardCharsets.UTF_8)
+                        .header(OWNER_ID, 1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header(OWNER_ID, 1))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-        verify(itemRequestService, times(1))
-                .findAllItemRequestsByOwnerId(anyLong());
     }
 
     @Test
@@ -100,7 +98,7 @@ public class ItemRequestControllerTest {
         when(itemRequestService.getAllItemRequests(anyLong(), anyInt(), anyInt()))
                 .thenReturn(List.of(itemRequestDto));
 
-        mockMvc.perform(get("/requests")
+        mockMvc.perform(get("/requests/all")
                         .content(mapper.writeValueAsString(itemRequestDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)

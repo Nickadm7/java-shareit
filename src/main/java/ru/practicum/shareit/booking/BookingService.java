@@ -15,9 +15,5 @@ public interface BookingService {
 
     List<BookingDto> getAllBookingsByOwner(Long ownerId, State state, Integer from, Integer size);
 
-    //List<BookingDto> getAllBookingsByOwnerNoPagination(Long ownerId, State state);
-
-    //List<BookingDto> getAllBookingsByOwnerWithPagination(Long ownerId, State state, Integer from, Integer size);
-
     BookingDto updateBookingByOwner(Long bookingId, Long userId, Boolean approved);
 }

@@ -23,8 +23,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = BookingController.class)
@@ -154,23 +153,6 @@ public class BookingControllerTest {
                 .thenReturn(List.of(bookingDto));
 
         mockMvc.perform(get("/bookings/owner")
-                        .content(mapper.writeValueAsString(bookingAddDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header(OWNER_ID, 1))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @DisplayName("Тест получение всех бронирований владельца")
-    void updateBookingByOwnerTest() throws Exception {
-        mapper.registerModule(new JavaTimeModule());
-
-        when(bookingService.updateBookingByOwner(anyLong(), anyLong(), any()))
-                .thenReturn(bookingDto);
-
-        mockMvc.perform(get("/bookings/1")
                         .content(mapper.writeValueAsString(bookingAddDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)

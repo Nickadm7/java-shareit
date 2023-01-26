@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.item.dto.CommentOutDto;
 import ru.practicum.shareit.item.model.Comment;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
@@ -16,7 +17,13 @@ public class CommentMapperTest {
     @DisplayName("Тест маппера toCommentOutDto")
     void toCommentOutDtoTest() {
         User author = new User(1L, "testName", "testEmail");
-        Comment comment = new Comment(2L, "text", null, author, LocalDateTime.now());
+        Item item = new Item(1L,
+                "name",
+                "description",
+                true,
+                null,
+                null);
+        Comment comment = new Comment(2L, "text", item, author, LocalDateTime.now());
 
         CommentOutDto actual = CommentMapper.toCommentOutDto(comment, 3L);
 
@@ -30,7 +37,13 @@ public class CommentMapperTest {
     @DisplayName("Тест маппера toCommentOutForFindItemsDto")
     void toCommentOutForFindItemsDtoTest() {
         User author = new User(1L, "testName", "testEmail");
-        Comment comment = new Comment(2L, "text", null, author, LocalDateTime.now());
+        Item item = new Item(1L,
+                "name",
+                "description",
+                true,
+                null,
+                null);
+        Comment comment = new Comment(2L, "text", item, author, LocalDateTime.now());
 
         CommentOutDto actual = CommentMapper.toCommentOutForFindItemsDto(comment);
 

@@ -15,25 +15,14 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemMapper {
     public static ItemDto toItemDto(Item item) {
-        if (item.getItemRequest() != null) {
         return new ItemDto(
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
                 item.getOwner(),
-                item.getItemRequest().getId()
+                item.getItemRequest() != null ? item.getItemRequest().getId() : null
         );
-        } else {
-            return new ItemDto(
-                    item.getId(),
-                    item.getName(),
-                    item.getDescription(),
-                    item.getAvailable(),
-                    item.getOwner(),
-                    null
-            );
-        }
     }
 
     public static Item toItem(ItemDto itemDto, User owner, ItemRequest itemRequest) {

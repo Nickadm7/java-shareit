@@ -78,7 +78,6 @@ public class BookingServiceImpl implements BookingService {
             }
             PageRequest pageRequest = PageRequest.of(from / size, size);
             bufferAllBookings = bookingRepository.findAllBookings_BybookerId_OrderByEndDesc(userId, pageRequest);
-
         }
         switch (state) {
             case ALL:
