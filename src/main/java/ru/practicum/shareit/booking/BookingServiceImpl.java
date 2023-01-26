@@ -64,7 +64,6 @@ public class BookingServiceImpl implements BookingService {
         if (state == null) {
             state = State.ALL;
         }
-        List<Booking> outBookings = new ArrayList<>();
         List<Booking> bufferAllBookings;
         if (from == null || size == null) {
             bufferAllBookings = bookingRepository.findAllBookings_BybookerId_OrderByEndDesc(userId);
@@ -79,6 +78,61 @@ public class BookingServiceImpl implements BookingService {
             PageRequest pageRequest = PageRequest.of(from / size, size);
             bufferAllBookings = bookingRepository.findAllBookings_BybookerId_OrderByEndDesc(userId, pageRequest);
         }
+        return sortByStateForUser(bufferAllBookings, state, userId);
+    }
+
+    @Override
+    public List<BookingDto> getAllBookingsByOwner(Long ownerId, State state, Integer from, Integer size) {
+        utils.isUserExist(ownerId); //проверка существует ли пользователь
+        if (state == null) {
+            state = ALL;
+        }
+        List<Booking> bufferAllBookings;
+        if (from == null || size == null) {
+            bufferAllBookings = bookingRepository.findByItem_OwnerId_OrderByEndDesc(ownerId);
+        } else {
+            if (from == 0 && size == 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //не корректные параметры пагинации
+            }
+            if (from < 0 || size < 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //не корректные параметры пагинации
+            }
+            PageRequest pageRequest = PageRequest.of(from / size, size);
+            bufferAllBookings = bookingRepository.findByItem_OwnerId_OrderByEndDesc(ownerId, pageRequest);
+        }
+        return sortByStateForOwner(bufferAllBookings, state, ownerId);
+    }
+
+    @Override
+    public BookingDto updateBookingByOwner(Long bookingId, Long userId, Boolean approved) {
+        if (!utils.isBookingExistById(bookingId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //бронирование не существует
+        }
+        utils.isUserExist(userId);
+        if (approved == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //статус неверно передан
+        }
+        Long ownerId = utils.getItemById(bookingRepository.findById(bookingId).get().getItem().getId())
+                .getOwner().getId();
+        if (!ownerId.equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //пользователь не владелец вещи
+        }
+        if (bookingRepository.findById(bookingId).get().getStatus().equals(Status.APPROVED)
+                && approved.equals(Boolean.TRUE)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //бронирование уже подтверждено
+        }
+        Booking booking = bookingRepository.findById(bookingId).get();
+        if (approved.equals(Boolean.TRUE)) {
+            booking.setStatus(Status.APPROVED);
+        } else {
+            booking.setStatus(Status.REJECTED);
+        }
+        bookingRepository.save(booking);
+        return BookingMapper.toBookingDto(booking);
+    }
+
+    public List<BookingDto> sortByStateForUser(List<Booking> bufferAllBookings, State state, Long userId) {
+        List<Booking> outBookings = new ArrayList<>();
         switch (state) {
             case ALL:
                 outBookings = bufferAllBookings;
@@ -117,26 +171,8 @@ public class BookingServiceImpl implements BookingService {
         return converterBookingToDto(outBookings);
     }
 
-    @Override
-    public List<BookingDto> getAllBookingsByOwner(Long ownerId, State state, Integer from, Integer size) {
-        utils.isUserExist(ownerId); //проверка существует ли пользователь
-        if (state == null) {
-            state = ALL;
-        }
+    public List<BookingDto> sortByStateForOwner(List<Booking> bufferAllBookings, State state, Long ownerId){
         List<Booking> outBookings = new ArrayList<>();
-        List<Booking> bufferAllBookings;
-        if (from == null || size == null) {
-            bufferAllBookings = bookingRepository.findByItem_OwnerId_OrderByEndDesc(ownerId);
-        } else {
-            if (from == 0 && size == 0) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //не корректные параметры пагинации
-            }
-            if (from < 0 || size < 0) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //не корректные параметры пагинации
-            }
-            PageRequest pageRequest = PageRequest.of(from / size, size);
-            bufferAllBookings = bookingRepository.findByItem_OwnerId_OrderByEndDesc(ownerId, pageRequest);
-        }
         switch (state) {
             case ALL:
                 outBookings = bufferAllBookings;
@@ -173,35 +209,6 @@ public class BookingServiceImpl implements BookingService {
                 throw new ValidationException("Unknown state: " + state); //такого статуса нет
         }
         return converterBookingToDto(outBookings);
-    }
-
-    @Override
-    public BookingDto updateBookingByOwner(Long bookingId, Long userId, Boolean approved) {
-        if (!utils.isBookingExistById(bookingId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //бронирование не существует
-        }
-        utils.isUserExist(userId);
-        if (approved == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //статус неверно передан
-        }
-        Long ownerId = utils.getItemById(bookingRepository.findById(bookingId).get().getItem().getId())
-                .getOwner().getId();
-        if (!ownerId.equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //пользователь не владелец вещи
-        }
-        if (bookingRepository.findById(bookingId).get().getStatus().equals(Status.APPROVED)
-                && approved.equals(Boolean.TRUE)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //бронирование уже подтверждено
-        }
-        Booking booking = bookingRepository.findById(bookingId).get();
-        if (approved.equals(Boolean.TRUE)) {
-            booking.setStatus(Status.APPROVED);
-            bookingRepository.save(booking);
-        } else {
-            booking.setStatus(Status.REJECTED);
-            bookingRepository.save(booking);
-        }
-        return BookingMapper.toBookingDto(booking);
     }
 
     private List<BookingDto> converterBookingToDto(List<Booking> bufferOutBooking) {

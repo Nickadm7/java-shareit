@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.model.Status;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemOutForFindDto;
 import ru.practicum.shareit.item.model.Item;
@@ -207,4 +208,35 @@ public class BookingServiceTest {
         assertThrows(ResponseStatusException.class,
                 () -> bookingService.updateBookingByOwner(1L, 1L, false));
     }
+
+    @Test
+    @DisplayName("Тест обновление не найдено бронирование")
+    void sortByStateForUserTest() {
+        List<Booking> bufferBooking = List.of(booking);
+        bookingService.sortByStateForUser(bufferBooking, State.ALL, 1L);
+        bookingService.sortByStateForUser(bufferBooking, State.CURRENT, 1L);
+        bookingService.sortByStateForUser(bufferBooking, State.PAST, 1L);
+        bookingService.sortByStateForUser(bufferBooking, State.FUTURE, 1L);
+        bookingService.sortByStateForUser(bufferBooking, State.WAITING, 1L);
+        bookingService.sortByStateForUser(bufferBooking, State.REJECTED, 1L);
+        assertThrows(ValidationException.class,
+                () -> bookingService.sortByStateForUser(bufferBooking, State.UNSUPPORTED_STATUS, 1L));
+
+    }
+
+    @Test
+    @DisplayName("Тест обновление не найдено бронирование")
+    void sortByStateForUserOwner() {
+        List<Booking> bufferBooking = List.of(booking);
+        bookingService.sortByStateForOwner(bufferBooking, State.ALL, 1L);
+        bookingService.sortByStateForOwner(bufferBooking, State.CURRENT, 1L);
+        bookingService.sortByStateForOwner(bufferBooking, State.PAST, 1L);
+        bookingService.sortByStateForOwner(bufferBooking, State.FUTURE, 1L);
+        bookingService.sortByStateForOwner(bufferBooking, State.WAITING, 1L);
+        bookingService.sortByStateForOwner(bufferBooking, State.REJECTED, 1L);
+        assertThrows(ValidationException.class,
+                () -> bookingService.sortByStateForOwner(bufferBooking, State.UNSUPPORTED_STATUS, 1L));
+    }
+
+
 }
