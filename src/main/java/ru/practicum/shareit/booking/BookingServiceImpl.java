@@ -29,9 +29,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto addBooking(BookingAddDto bookingAddDto, Long bookerId) {
         utils.isUserExist(bookerId);
-        if (!utils.isItemExist(bookingAddDto.getItemId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //вещь не существует
-        }
+        utils.isItemExist(bookingAddDto.getItemId());
         if (!utils.isItemAvailable(bookingAddDto.getItemId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //вещь не доступна для бронирования
         }

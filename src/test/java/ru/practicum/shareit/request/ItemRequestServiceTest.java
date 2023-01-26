@@ -77,10 +77,14 @@ public class ItemRequestServiceTest {
     @DisplayName("Тест поиск запроса по id")
     void getAllItemRequestsTest() {
         assertThrows(IllegalArgumentException.class,
-                () -> itemRequestService.getAllItemRequests(1L, 0, 0));
+                () -> itemRequestService.getAllItemRequests(99L, 0, 0));
+    }
 
-
-
+    @Test
+    @DisplayName("Тест поиск запроса по id")
+    void getAllItemRequestsTest1() {
+        assertThrows(IllegalArgumentException.class,
+                () -> itemRequestService.getAllItemRequests(99L, 0, 0));
     }
 
 

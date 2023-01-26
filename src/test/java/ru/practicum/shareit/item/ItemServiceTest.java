@@ -6,15 +6,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.practicum.shareit.item.dto.CommentOutDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemOutForFindDto;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.utils.Utils;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -77,5 +82,70 @@ class ItemServiceTest {
         List<ItemOutForFindDto> actualItem = itemService.findItemsByUserId(1L);
 
         verify(itemRepository, times(1)).findItemsByOwnerId(anyLong());
+    }
+
+    @Test
+    @DisplayName("Тест обновление вещи")
+    void updateItemTest() {
+        ItemDto newItemDto = new ItemDto(1L,
+                "ItemTestName",
+                "TestDescription",
+                true,
+                null,
+                null);
+
+        assertThrows(NoSuchElementException.class,
+                () -> itemService.updateItem(newItemDto, 1L, 1L));
+    }
+
+    @Test
+    @DisplayName("Тест обновление вещи")
+    void updateItemWrongParameterTest() {
+        ItemDto newItemDto = new ItemDto(1L,
+                "ItemTestName",
+                "TestDescription",
+                true,
+                null,
+                null);
+
+        assertThrows(NoSuchElementException.class,
+                () -> itemService.updateItem(newItemDto, 0L, 0L));
+    }
+
+    @Test
+    @DisplayName("Тест обновление вещи")
+    void updateItemWrongParameterTest1() {
+        ItemDto newItemDto = new ItemDto(1L,
+                "ItemTestName",
+                "",
+                true,
+                null,
+                null);
+
+        assertThrows(NoSuchElementException.class,
+                () -> itemService.updateItem(newItemDto, 0L, 0L));
+    }
+
+    @Test
+    @DisplayName("Тест удаление вещи по id")
+    void deleteByIdTest() {
+        assertThrows(NoSuchElementException.class,
+                () -> itemService.deleteById(0L, 0L));
+    }
+
+    @Test
+    @DisplayName("Тест конвертация CommentToOutDto")
+    void converterCommentToOutDtoTest() {
+        User author = new User(1L, "testName", "testEmail");
+        Item item = new Item(1L,
+                "name",
+                "description",
+                true,
+                null,
+                null);
+        Comment comment = new Comment(2L, "text", item, author, LocalDateTime.now());
+        List<CommentOutDto> actual = itemService.converterCommentToOutDto(List.of(comment));
+
+        assertEquals(actual.get(0).getId(), 2L);
     }
 }

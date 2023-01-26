@@ -100,7 +100,6 @@ public class BookingServiceTest {
         when(itemService.getItemById(anyLong(), anyLong())).thenReturn(itemOutForFindDto);
         when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
         when(bookingRepository.save(any())).thenReturn(booking);
-        when(utils.isItemExist(anyLong())).thenReturn(true);
 
         when(bookingRepository.save(booking))
                 .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST));
@@ -116,7 +115,7 @@ public class BookingServiceTest {
         when(itemService.getItemById(anyLong(), anyLong())).thenReturn(itemOutForFindDto);
         when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
         when(bookingRepository.save(any())).thenReturn(booking);
-        when(utils.isItemExist(anyLong())).thenReturn(true);
+        //when(utils.isItemExist(anyLong())).thenReturn(true);
         when(utils.isItemAvailable(anyLong())).thenReturn(true);
         when(utils.getItemById(anyLong())).thenReturn(item);
 

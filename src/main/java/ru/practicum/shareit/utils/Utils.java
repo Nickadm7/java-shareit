@@ -1,6 +1,7 @@
 package ru.practicum.shareit.utils;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,6 +20,7 @@ import ru.practicum.shareit.user.model.User;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class Utils {
@@ -46,6 +48,7 @@ public class Utils {
         if (itemRequestId != null) {
             return itemRequestRepository.getReferenceById(itemRequestId);
         } else {
+            log.info("Не найден запрос по id: {}", itemRequestId);
             return null;
         }
     }
@@ -54,8 +57,11 @@ public class Utils {
         return itemRepository.findItemsByItemRequestId(requestId);
     }
 
-    public boolean isItemExist(Long itemId) {
-        return itemRepository.existsById(itemId);
+    public void isItemExist(Long itemId) {
+        if (itemRepository.findById(itemId).isEmpty()) {
+            log.info("Не удалось найти вещь по id: {}", itemId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //вещь не существует
+        }
     }
 
     public boolean isItemAvailable(Long itemId) {

@@ -149,8 +149,9 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    private List<CommentOutDto> converterCommentToOutDto(List<Comment> bufferOutComments) {
-        return bufferOutComments.stream()
+    public List<CommentOutDto> converterCommentToOutDto(List<Comment> bufferOutComments) {
+        return bufferOutComments
+                .stream()
                 .map(CommentMapper::toCommentOutForFindItemsDto)
                 .collect(Collectors.toList());
     }
