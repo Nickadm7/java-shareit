@@ -166,6 +166,13 @@ public class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Тест все бронирования пользователя неправильный статус")
+    void getAllBookingsByUserWrongPaginationTest2() {
+        assertThrows(ResponseStatusException.class,
+                () -> bookingService.getAllBookingsByUser(1L, State.CURRENT, -1, 0));
+    }
+
+    @Test
     @DisplayName("Тест все бронирования владельца неправильная пагинация 0 и 0")
     void getAllBookingsByOwnerTest() {
         assertThrows(ResponseStatusException.class,
@@ -192,5 +199,12 @@ public class BookingServiceTest {
         assertEquals(booking.getId(), actual.get(0).getId());
         assertEquals(booking.getStatus(), actual.get(0).getStatus());
         assertEquals(booking.getStart(), actual.get(0).getStart());
+    }
+
+    @Test
+    @DisplayName("Тест обновление не найдено бронирование")
+    void updateBookingByOwnerTest() {
+        assertThrows(ResponseStatusException.class,
+                () -> bookingService.updateBookingByOwner(1L, 1L, false));
     }
 }

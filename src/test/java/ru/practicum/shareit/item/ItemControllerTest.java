@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,17 +9,22 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentOutDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemOutForFindDto;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.utils.Utils;
 
-
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -36,6 +42,13 @@ public class ItemControllerTest {
     private final ObjectMapper mapper = new ObjectMapper();
 
     private static final String OWNER_ID = "X-Sharer-User-Id";
+    private final User user = new User(1L, "userTestName", "mailtest@mail.ru");
+    private final Item item = new Item(1L,
+            "name",
+            "description",
+            true,
+            user,
+            null);
     private final ItemDto itemDto = new ItemDto(1L,
             "ItemTestName",
             "TestDescription",
@@ -55,6 +68,15 @@ public class ItemControllerTest {
             null,
             null,
             null);
+    private final CommentDto commentDto = new CommentDto(1L,
+            "text",
+            item,
+            user,
+            LocalDateTime.now());
+    private final CommentOutDto commentOutDto = new CommentOutDto("text",
+            "testName",
+            LocalDateTime.now());
+
 
     @Test
     @DisplayName("Тест добавление вещи")
@@ -141,6 +163,38 @@ public class ItemControllerTest {
                         .characterEncoding(StandardCharsets.UTF_8)
                         .header(OWNER_ID, 1L)
                         .queryParam("text", "test")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Тест добавление нового комментария")
+    void addCommentsTest() throws Exception {
+        mapper.registerModule(new JavaTimeModule());
+        when(itemService.addComment(commentDto, 0L, 0L))
+                .thenReturn(commentOutDto);
+
+       mockMvc.perform(post("/items/1/comment")
+                        .content(mapper.writeValueAsString(commentDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .header(OWNER_ID, 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Тест обновление вещи")
+    void updateItemTest() throws Exception {
+        mapper.registerModule(new JavaTimeModule());
+        when(itemService.updateItem(itemDto, 0L, 0L))
+                .thenReturn(itemDto);
+
+        mockMvc.perform(patch("/items/1")
+                        .content(mapper.writeValueAsString(itemDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .header(OWNER_ID, 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
