@@ -171,7 +171,7 @@ public class BookingServiceImpl implements BookingService {
         return converterBookingToDto(outBookings);
     }
 
-    public List<BookingDto> sortByStateForOwner(List<Booking> bufferAllBookings, State state, Long ownerId){
+    public List<BookingDto> sortByStateForOwner(List<Booking> bufferAllBookings, State state, Long ownerId) {
         List<Booking> outBookings = new ArrayList<>();
         switch (state) {
             case ALL:
