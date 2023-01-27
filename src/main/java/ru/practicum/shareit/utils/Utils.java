@@ -78,6 +78,7 @@ public class Utils {
         Long ownerId = itemRepository.findById(bookingRepository.findById(bookingId).get().getId())
                 .get().getOwner().getId();
         if (!bookerId.equals(userId) && !ownerId.equals(userId)) {
+            log.info("Нет доступа к просмотру бронирования bookingId: {} и userId: {}", bookingId, userId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND); //нет доступа к просмотру бронирования
         }
     }

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -107,5 +108,40 @@ class UserServiceTest {
 
         assertThrows(ResponseStatusException.class,
                 () -> userService.updateUser(userDto, null));
+    }
+
+    @Test
+    @DisplayName("Тест удаление пользователя по id")
+    void deleteByIdTest() {
+        userService.deleteById(1L);
+
+        verify(userRepository, times(1)).deleteById(any());
+    }
+
+    @Test
+    @DisplayName("Тест проверка email конфликт")
+    void checkUserEmailConflictTest() {
+        UserDto userDto = new UserDto(1L, "userTestName", "mailtest@mail.ru");
+        User user = new User(1L, "userTestName", "mailtest@mail.ru");
+        when(userRepository.findAll())
+                .thenReturn(List.of(user));
+
+        ResponseStatusException thrown = assertThrows(ResponseStatusException.class,
+                () -> userService.checkUserEmail(userDto));
+
+        Assertions.assertEquals(thrown.getMessage(), "409 CONFLICT");
+    }
+
+    @Test
+    @DisplayName("Тест успешная проверка email")
+    void checkUserEmailTest() {
+        UserDto userDto = new UserDto(1L, "userTestName", "mailtest1@mail.ru");
+        User user = new User(1L, "userTestName", "mailtest@mail.ru");
+        when(userRepository.findAll())
+                .thenReturn(List.of(user));
+
+        userService.checkUserEmail(userDto);
+
+        verify(userRepository, times(1)).findAll();
     }
 }

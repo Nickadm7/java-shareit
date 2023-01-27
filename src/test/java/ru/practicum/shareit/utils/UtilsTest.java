@@ -16,6 +16,7 @@ import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.UserServiceImpl;
+import ru.practicum.shareit.user.dto.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
@@ -155,7 +156,7 @@ public class UtilsTest {
 
     @Test
     @DisplayName("Тест поиск вещи по запросу")
-    void findItemsByRequestId() {
+    void findItemsByRequestIdTest() {
         Mockito
                 .when(mockItemRepository.findItemsByItemRequestId(anyLong()))
                 .thenReturn(List.of(item));
@@ -163,5 +164,32 @@ public class UtilsTest {
         List<Item> actual = utils.findItemsByRequestId(1L);
 
         Assertions.assertEquals(1, actual.get(0).getId());
+    }
+
+    @Test
+    @DisplayName("Тест поиск запроса по null id")
+    void getItemRequestByNullIdTest() {
+        Long itemRequestId = null;
+
+        ItemRequest actual = utils.getItemRequestById(itemRequestId);
+
+        Assertions.assertNull(actual);
+    }
+
+    @Test
+    @DisplayName("Тест поиск запроса по id")
+    void getItemRequestByIdTest() {
+        ItemRequest itemRequest = new ItemRequest(
+                1L,
+                "testDescription",
+                new User(),
+                LocalDateTime.now());
+        Mockito
+                .when(mockItemRequestRepository.getReferenceById(anyLong()))
+                .thenReturn((itemRequest));
+
+        ItemRequest actual = utils.getItemRequestById(1L);
+
+        Assertions.assertEquals(1, actual.getId());
     }
 }
