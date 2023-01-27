@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
+
     @Override
     public UserDto addUser(UserDto userDto) {
         if (userDto.getEmail() != null) {

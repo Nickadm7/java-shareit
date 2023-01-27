@@ -1,75 +1,167 @@
 package ru.practicum.shareit.utils;
 
-import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.mockito.Mockito;
 import org.springframework.web.server.ResponseStatusException;
-import ru.practicum.shareit.booking.BookingMapper;
-import ru.practicum.shareit.booking.BookingService;
-import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.dto.BookingOutDto;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.ItemRepository;
-import ru.practicum.shareit.item.ItemService;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserMapper;
+import ru.practicum.shareit.request.ItemRequestRepository;
+import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.UserServiceImpl;
 import ru.practicum.shareit.user.model.User;
 
-import javax.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 
-@SpringBootTest
-@Transactional
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UtilsTest {
-    private final Utils utils;
-    private final UserService userService;
-    private final ItemService itemService;
-    private final ItemRepository itemRepository;
-    private final BookingService bookingService;
-    private final UserMapper userMapper;
-    private final ItemMapper itemMapper;
-    private final BookingMapper bookingMapper;
-    private User user = new User(1L, "testName", "testemail@mail.ru");
-    private User user2 = new User(2L, "testName2", "testemail@mail.ru");
-    private Item item = new Item(1L, "itemName", "itemDescription", true, user, null);
 
-    @Test
-    @DisplayName("Тест получение пользователя по id")
-    void getUserByIdTest() {
-        UserDto newUserDto = userService.addUser(userMapper.toUserDto(user));
-        User actual = utils.getUserById(newUserDto.getId());
-        assertEquals("testName", actual.getName());
+    private final UserService mockUserService = Mockito.mock(UserServiceImpl.class);
+    private final UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
+    private final ItemRepository mockItemRepository = Mockito.mock(ItemRepository.class);
+    private final BookingRepository mockBookingRepository = Mockito.mock(BookingRepository.class);
+    private final ItemRequestRepository mockItemRequestRepository = Mockito.mock(ItemRequestRepository.class);
+    private Utils utils;
+
+    Booking bookingForTest;
+    Item item;
+
+    @BeforeEach
+    void initItemService() {
+        utils = new Utils(mockUserService,
+                mockUserRepository,
+                mockItemRepository,
+                mockBookingRepository,
+                mockItemRequestRepository);
+    }
+
+    @BeforeEach
+    void initUser() {
+        User user = new User(1L, "userTestName", "mailtest@mail.ru");
+        User owner = new User(2L, "ownerTestName", "ownermailtest@mail.ru");
+        item = new Item(1L,
+                "ItemTestName",
+                "TestDescription",
+                true,
+                owner,
+                null);
+        LocalDateTime start = LocalDateTime.parse("2222-10-12T14:00");
+        LocalDateTime end = LocalDateTime.parse("2222-12-12T14:00");
+        bookingForTest = new Booking(1L,
+                start,
+                end,
+                item,
+                owner,
+                Status.APPROVED
+        );
     }
 
     @Test
-    @DisplayName("Тест получение вещи по id не найден владелец")
-    void getItemByIdTest() {
-        Item actual = utils.getItemById(99L);
+    @DisplayName("Тест isUserExist не существует пользователь")
+    void isUserExistTest() {
+        ResponseStatusException thrown = assertThrows(ResponseStatusException.class,
+                () -> utils.isUserExist(99L));
 
-        assertThrows(EntityNotFoundException.class,
-                () -> actual.equals(null));
+        Assertions.assertEquals("404 NOT_FOUND", thrown.getMessage());
     }
 
     @Test
-    @DisplayName("Тест проверка существования вещи по id")
-    void isItemExistTest() {
-        UserDto newUserDto = userService.addUser(userMapper.toUserDto(user));
-        ItemDto newItemDto = itemService.addItem(ItemMapper.toItemDto(item), 1L);
-        utils.isItemExist(1L);
+    @DisplayName("Тест пользователь не владелец вещи")
+    void checkItemsToOwnerTest() {
+        Mockito
+                .when(mockBookingRepository.findById(anyLong()))
+                .thenReturn(Optional.of(bookingForTest));
+        Mockito
+                .when(mockItemRepository.findById(anyLong()))
+                .thenReturn(Optional.of(item));
+
+        ResponseStatusException thrown = assertThrows(ResponseStatusException.class,
+                () -> utils.checkItemsToOwner(99L, 99L));
+
+        Assertions.assertEquals("404 NOT_FOUND", thrown.getMessage());
     }
 
     @Test
-    @DisplayName("Тест получение вещи по неправильному id")
-    void isItemExistWrongIdTest() {
-        assertThatExceptionOfType(ResponseStatusException.class)
-                .isThrownBy(() -> utils.isItemExist(99L));
+    @DisplayName("Тест получение последнего бронирования")
+    void getLastBookingTest() {
+        Mockito
+                .when(mockBookingRepository.findFirstByItemIdAndEndBeforeOrderByEndDesc(anyLong(), any()))
+                .thenReturn(bookingForTest);
+
+        BookingOutDto actual = utils.getLastBooking(1L);
+
+        Assertions.assertEquals(1L, actual.getId());
+    }
+
+    @Test
+    @DisplayName("Тест получение следующего бронирования")
+    void getNextBookingTest() {
+        Mockito
+                .when(mockBookingRepository.findFirstByItemIdAndStartAfterOrderByStartAsc(anyLong(), any()))
+                .thenReturn(bookingForTest);
+
+        BookingOutDto actual = utils.getNextBooking(1L);
+
+        Assertions.assertEquals(1L, actual.getId());
+    }
+
+    @Test
+    @DisplayName("Тест получение всех бронирований по BookerId и ItemId")
+    void findAllBookingsByBookerIdAndItemIdTest() {
+        Mockito
+                .when(mockBookingRepository.findAllBookingsByBookerIdAndItemId(anyLong(), anyLong()))
+                .thenReturn(List.of(bookingForTest));
+
+        List<Booking> actual = utils.findAllBookingsByBookerIdAndItemId(1L, 1L);
+
+        Assertions.assertEquals(1L, actual.get(0).getId());
+    }
+
+    @Test
+    @DisplayName("Тест существует ли вещь")
+    void isItemAvailableTest() {
+        Mockito
+                .when(mockItemRepository.findById(anyLong()))
+                .thenReturn(Optional.of(item));
+
+        boolean actual = utils.isItemAvailable(1L);
+
+        Assertions.assertTrue(actual);
+    }
+
+    @Test
+    @DisplayName("Тест существует ли бронирование")
+    void isBookingExistByIdTest() {
+        Mockito
+                .when(mockBookingRepository.findById(anyLong()))
+                .thenReturn(Optional.of(bookingForTest));
+
+        boolean actual = utils.isBookingExistById(1L);
+
+        Assertions.assertTrue(actual);
+    }
+
+    @Test
+    @DisplayName("Тест поиск вещи по запросу")
+    void findItemsByRequestId() {
+        Mockito
+                .when(mockItemRepository.findItemsByItemRequestId(anyLong()))
+                .thenReturn(List.of(item));
+
+        List<Item> actual = utils.findItemsByRequestId(1L);
+
+        Assertions.assertEquals(1, actual.get(0).getId());
     }
 }

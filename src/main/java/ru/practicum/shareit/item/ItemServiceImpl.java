@@ -38,10 +38,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentOutDto addComment(CommentDto commentDto, Long userId, Long itemId) {
-        if (itemId == null || userId == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //не найден id вещи или владельца
-        }
+        checkNotNull(userId, itemId);
         if (commentDto.getText().isBlank()) {
+            log.info("Комментарий при добавлении не может быть пустой");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //комментарий не может быть пустой
         }
         List<Booking> bufferBookings = utils.findAllBookingsByBookerIdAndItemId(userId, itemId);
@@ -119,9 +118,7 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getId() == null) {
             itemDto.setId(itemId);
         }
-        if (itemId == null || ownerId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        checkNotNull(itemId, ownerId);
         if (itemDto.getName() == null) {
             itemDto.setName(itemRepository.findById(itemId).get().getName());
         }
@@ -154,5 +151,12 @@ public class ItemServiceImpl implements ItemService {
                 .stream()
                 .map(CommentMapper::toCommentOutForFindItemsDto)
                 .collect(Collectors.toList());
+    }
+
+    public void checkNotNull(Long first, Long second) {
+        if (first == null || second == null) {
+            log.info("Не найден id вещи или владельца");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //не найден id вещи или владельца
+        }
     }
 }

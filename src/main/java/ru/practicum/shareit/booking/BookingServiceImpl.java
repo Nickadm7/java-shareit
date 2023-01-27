@@ -107,9 +107,6 @@ public class BookingServiceImpl implements BookingService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //бронирование не существует
         }
         utils.isUserExist(userId);
-        if (approved == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //статус неверно передан
-        }
         Long ownerId = utils.getItemById(bookingRepository.findById(bookingId).get().getItem().getId())
                 .getOwner().getId();
         if (!ownerId.equals(userId)) {

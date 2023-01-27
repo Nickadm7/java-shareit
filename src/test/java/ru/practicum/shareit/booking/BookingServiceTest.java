@@ -20,6 +20,7 @@ import ru.practicum.shareit.utils.Utils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -210,6 +211,14 @@ public class BookingServiceTest {
 
     @Test
     @DisplayName("Тест обновление не найдено бронирование")
+    void updateBookingByOwnerTest1() {
+        when(utils.isBookingExistById(anyLong())).thenReturn(true);
+        assertThrows(NoSuchElementException.class,
+                () -> bookingService.updateBookingByOwner(1L, 1L, false));
+    }
+
+    @Test
+    @DisplayName("Тест обновление не найдено бронирование")
     void sortByStateForUserTest() {
         List<Booking> bufferBooking = List.of(booking);
         bookingService.sortByStateForUser(bufferBooking, State.ALL, 1L);
@@ -236,6 +245,4 @@ public class BookingServiceTest {
         assertThrows(ValidationException.class,
                 () -> bookingService.sortByStateForOwner(bufferBooking, State.UNSUPPORTED_STATUS, 1L));
     }
-
-
 }

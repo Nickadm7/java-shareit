@@ -160,4 +160,22 @@ public class BookingControllerTest {
                         .header(OWNER_ID, 1))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("Тест получение всех бронирований владельца")
+    void updateBookingByOwnerTest() throws Exception {
+        mapper.registerModule(new JavaTimeModule());
+
+        when(bookingService.updateBookingByOwner(anyLong(), anyLong(), any()))
+                .thenReturn(bookingDto);
+
+        mockMvc.perform(patch("/bookings/1")
+                        .content(mapper.writeValueAsString(bookingAddDto))
+                        .param("approved", String.valueOf(true))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(OWNER_ID, 1))
+                .andExpect(status().isOk());
+    }
 }

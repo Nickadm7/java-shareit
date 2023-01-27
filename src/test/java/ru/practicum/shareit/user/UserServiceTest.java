@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -43,10 +42,7 @@ class UserServiceTest {
     @Test
     @DisplayName("Тест добавление нового пользователя неверный email")
     void addUserWrongEmailTest() {
-        UserDto userToSaveDto = new UserDto(1L, "userTestName", "");
-
-        when(userRepository.save(any(User.class)))
-                .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST));
+        UserDto userToSaveDto = new UserDto(1L, "userTestName", null);
 
         assertThrows(ResponseStatusException.class,
                 () -> userService.addUser(userToSaveDto));
@@ -70,7 +66,6 @@ class UserServiceTest {
     @DisplayName("Тест поиск пользователя по неверному id")
     void getUserByIdTestWrongIdTest() {
         Long userId = 0L;
-
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         assertThrows(ResponseStatusException.class,
@@ -100,8 +95,17 @@ class UserServiceTest {
         when(userRepository.save(any(User.class)))
                 .thenReturn(new User());
 
-        userService.updateUser((new UserDto(1L, "userTestName", "mailtest@mail.ru")), 1L);
+        userService.updateUser((new UserDto(null, "userTestName", "mailtest@mail.ru")), 1L);
 
         verify(userRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("Тест обновление пользователя userId равен null")
+    void updateUserNullUserIdTest() {
+        UserDto userDto = new UserDto(1L, "userTestName", "mailtest@mail.ru");
+
+        assertThrows(ResponseStatusException.class,
+                () -> userService.updateUser(userDto, null));
     }
 }

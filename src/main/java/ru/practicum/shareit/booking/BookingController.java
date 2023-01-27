@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingAddDto;
@@ -51,7 +52,7 @@ public class BookingController {
     @PatchMapping("/{bookingId}")
     public BookingDto updateBookingByOwner(@PathVariable Long bookingId,
                                            @RequestHeader(OWNER_ID) Long userId,
-                                           @RequestParam Boolean approved) {
+                                           @RequestParam @NonNull Boolean approved) {
         log.info("POST-запрос к эндпоинту /bookings/ обновление бронирования id: {}", bookingId);
         return bookingService.updateBookingByOwner(bookingId, userId, approved);
     }

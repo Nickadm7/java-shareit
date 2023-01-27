@@ -72,7 +72,7 @@ public class Utils {
         return bookingRepository.findById(bookingId).isPresent();
     }
 
-    public boolean checkItemsToOwner(Long bookingId, Long userId) {
+    public void checkItemsToOwner(Long bookingId, Long userId) {
         Long bookerId = bookingRepository.findById(bookingId)
                 .get().getBooker().getId();
         Long ownerId = itemRepository.findById(bookingRepository.findById(bookingId).get().getId())
@@ -80,7 +80,6 @@ public class Utils {
         if (!bookerId.equals(userId) && !ownerId.equals(userId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND); //нет доступа к просмотру бронирования
         }
-        return false;
     }
 
     public List<Booking> findAllBookingsByBookerIdAndItemId(Long bookerId, Long itemId) {
@@ -88,12 +87,14 @@ public class Utils {
     }
 
     public BookingOutDto getLastBooking(Long itemId) {
-        return BookingMapper.toBookingOutDto(bookingRepository.findFirstByItemIdAndEndBeforeOrderByEndDesc(itemId,
-                LocalDateTime.now()));
+        Booking outBooking = bookingRepository.findFirstByItemIdAndEndBeforeOrderByEndDesc(itemId,
+                LocalDateTime.now());
+        return BookingMapper.toBookingOutDto(outBooking);
     }
 
     public BookingOutDto getNextBooking(Long itemId) {
-        return BookingMapper.toBookingOutDto(bookingRepository.findFirstByItemIdAndStartAfterOrderByStartAsc(itemId,
-                LocalDateTime.now()));
+        Booking outBooking = bookingRepository.findFirstByItemIdAndStartAfterOrderByStartAsc(itemId,
+                LocalDateTime.now());
+        return BookingMapper.toBookingOutDto(outBooking);
     }
 }

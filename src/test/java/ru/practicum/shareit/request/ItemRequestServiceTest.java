@@ -74,18 +74,25 @@ public class ItemRequestServiceTest {
     }
 
     @Test
-    @DisplayName("Тест поиск запроса по id")
-    void getAllItemRequestsTest() {
+    @DisplayName("Тест поиск запроса по неверному id")
+    void getAllItemRequestsWrongIdTest() {
         assertThrows(IllegalArgumentException.class,
                 () -> itemRequestService.getAllItemRequests(99L, 0, 0));
     }
 
     @Test
-    @DisplayName("Тест поиск запроса по id")
-    void getAllItemRequestsTest1() {
-        assertThrows(IllegalArgumentException.class,
-                () -> itemRequestService.getAllItemRequests(99L, 0, 0));
+    @DisplayName("Тест поиск всех запросов")
+    void getAllItemRequestsTest() {
+        itemRequestService.getAllItemRequests(1L, 1, 1);
+
+        verify(itemRequestRepository, times(1)).findByRequestUserIdNot(anyLong(), any());
     }
 
+    @Test
+    @DisplayName("Тест поиск всех запросов from = 0")
+    void getAllItemRequestsFromIsNullTest() {
+        itemRequestService.getAllItemRequests(1L, null, 1);
 
+        verify(itemRequestRepository, times(1)).findByRequestUserIdNot(anyLong());
+    }
 }
