@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -116,7 +117,6 @@ public class BookingServiceTest {
         when(itemService.getItemById(anyLong(), anyLong())).thenReturn(itemOutForFindDto);
         when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
         when(bookingRepository.save(any())).thenReturn(booking);
-        //when(utils.isItemExist(anyLong())).thenReturn(true);
         when(utils.isItemAvailable(anyLong())).thenReturn(true);
         when(utils.getItemById(anyLong())).thenReturn(item);
 
@@ -136,6 +136,22 @@ public class BookingServiceTest {
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         verify(bookingRepository, times(0)).findById(anyLong());
+    }
+
+    @Test
+    @DisplayName("Тест добавление бронирования")
+    void addBookingWrongEndTest() {
+        when(itemService.getItemById(anyLong(), anyLong())).thenReturn(itemOutForFindDto);
+        when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
+        when(bookingRepository.save(any())).thenReturn(booking);
+        when(utils.isItemAvailable(anyLong())).thenReturn(true);
+        when(utils.getItemById(anyLong())).thenReturn(item);
+        booking.setEnd(LocalDateTime.parse("1111-12-12T14:00"));
+
+        ResponseStatusException thrown = assertThrows(ResponseStatusException.class,
+                () -> bookingService.addBooking(BookingMapper.toAddBookingDto(booking), 1L));
+
+        Assertions.assertEquals(thrown.getMessage(), ("400 BAD_REQUEST"));
     }
 
     @Test
@@ -215,6 +231,22 @@ public class BookingServiceTest {
         when(utils.isBookingExistById(anyLong())).thenReturn(true);
         assertThrows(NoSuchElementException.class,
                 () -> bookingService.updateBookingByOwner(1L, 1L, false));
+    }
+
+    @Test
+    @DisplayName("Тест обновление пользователь не владелец вещи")
+    void updateBookingByNotOwnerTest() {
+        when(utils.isBookingExistById(anyLong()))
+                .thenReturn(true);
+        when(utils.getItemById(anyLong()))
+                .thenReturn(item);
+        when(bookingRepository.findById(anyLong()))
+                .thenReturn(Optional.of(booking));
+
+        ResponseStatusException thrown = assertThrows(ResponseStatusException.class,
+                () -> bookingService.updateBookingByOwner(1L, 1L, false));
+
+        Assertions.assertEquals("404 NOT_FOUND", thrown.getMessage());
     }
 
     @Test
