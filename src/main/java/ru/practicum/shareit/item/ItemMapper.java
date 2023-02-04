@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingOutDto;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.dto.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
@@ -20,41 +21,18 @@ public class ItemMapper {
                 item.getDescription(),
                 item.getAvailable(),
                 item.getOwner(),
-                item.getItemRequest()
+                item.getItemRequest() != null ? item.getItemRequest().getId() : null
         );
     }
 
-    public static Item toItem(ItemDto itemDto, User owner) {
+    public static Item toItem(ItemDto itemDto, User owner, ItemRequest itemRequest) {
         return new Item(
                 itemDto.getId(),
                 itemDto.getName(),
                 itemDto.getDescription(),
                 itemDto.getAvailable(),
                 owner,
-                itemDto.getItemRequest()
-        );
-    }
-
-    public static ItemOutDto toItemOutDto(Item item, List<CommentDto> comments) {
-        return new ItemOutDto(
-                item.getId(),
-                item.getName(),
-                item.getDescription(),
-                item.getAvailable(),
-                item.getOwner(),
-                item.getItemRequest(),
-                comments
-        );
-    }
-
-    public static ItemOutDto toAllItemOutDto(Item item) {
-        return new ItemOutDto(
-                item.getId(),
-                item.getName(),
-                item.getDescription(),
-                item.getAvailable(),
-                item.getOwner(),
-                item.getItemRequest()
+                itemRequest
         );
     }
 

@@ -2,15 +2,13 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.user.dto.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class ItemOutDto {
     private Long id; //уникальный идентификатор вещи

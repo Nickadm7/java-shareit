@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
@@ -26,19 +28,19 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto addItem(ItemDto itemDto, Long ownerId) {
-        if (utils.isUserExist(ownerId)) {
-            return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto, utils.getUserById(ownerId))));
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        utils.isUserExist(ownerId);
+        log.info("Вещь успешно добавлена");
+        return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto,
+                utils.getUserById(ownerId),
+                utils.getItemRequestById(itemDto.getRequestId()))));
+
     }
 
     @Override
     public CommentOutDto addComment(CommentDto commentDto, Long userId, Long itemId) {
-        if (itemId == null || userId == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //не найден id вещи или владельца
-        }
+        checkNotNull(userId, itemId);
         if (commentDto.getText().isBlank()) {
+            log.info("Комментарий при добавлении не может быть пустой");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //комментарий не может быть пустой
         }
         List<Booking> bufferBookings = utils.findAllBookingsByBookerIdAndItemId(userId, itemId);
@@ -70,9 +72,7 @@ public class ItemServiceImpl implements ItemService {
         if (itemRepository.findById(itemId).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND); //вещь не найдена
         }
-        if (!utils.isUserExist(userId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //пользователь не существует
-        }
+        utils.isUserExist(userId);
         ItemOutForFindDto itemOutForFindDto;
         Item item = utils.getItemById(itemId);
         List<Comment> currentComments = commentRepository.findAllByItemId(itemId);
@@ -118,9 +118,7 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getId() == null) {
             itemDto.setId(itemId);
         }
-        if (itemId == null || ownerId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        checkNotNull(itemId, ownerId);
         if (itemDto.getName() == null) {
             itemDto.setName(itemRepository.findById(itemId).get().getName());
         }
@@ -131,7 +129,9 @@ public class ItemServiceImpl implements ItemService {
             itemDto.setAvailable(itemRepository.findById(itemId).get().getAvailable());
         }
         if ((itemRepository.findById(itemId).get().getOwner().getId()).equals(ownerId)) {
-            return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto, utils.getUserById(ownerId))));
+            return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto,
+                    utils.getUserById(ownerId),
+                    utils.getItemRequestById(itemDto.getRequestId()))));
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
@@ -146,9 +146,17 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    private List<CommentOutDto> converterCommentToOutDto(List<Comment> bufferOutComments) {
-        return bufferOutComments.stream()
+    public List<CommentOutDto> converterCommentToOutDto(List<Comment> bufferOutComments) {
+        return bufferOutComments
+                .stream()
                 .map(CommentMapper::toCommentOutForFindItemsDto)
                 .collect(Collectors.toList());
+    }
+
+    public void checkNotNull(Long first, Long second) {
+        if (first == null || second == null) {
+            log.info("Не найден id вещи или владельца");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //не найден id вещи или владельца
+        }
     }
 }

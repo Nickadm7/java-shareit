@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.validation.constraints.NotBlank;
@@ -26,5 +25,5 @@ public class ItemDto {
 
     private User owner; //владелец вещи
 
-    private ItemRequest itemRequest; //если вещь была создана по запросу другого пользователя, то храним его
+    private Long requestId; //если вещь была создана по запросу другого пользователя, то храним его
 }
