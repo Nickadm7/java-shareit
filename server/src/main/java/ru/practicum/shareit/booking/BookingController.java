@@ -1,11 +1,10 @@
 package ru.practicum.shareit.booking;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingAddDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import lombok.extern.slf4j.Slf4j;
 import ru.practicum.shareit.booking.model.State;
 
 import javax.validation.Valid;
@@ -20,13 +19,15 @@ public class BookingController {
     private static final String OWNER_ID = "X-Sharer-User-Id";
 
     @PostMapping
-    public BookingDto addBooking(@Valid @RequestBody BookingAddDto bookingAddDto, @RequestHeader(OWNER_ID) Long bookerId) {
+    public BookingDto addBooking(@Valid @RequestBody BookingAddDto bookingAddDto,
+                                 @RequestHeader(OWNER_ID) Long bookerId) {
         log.info("POST-запрос к эндпоинту /bookings владелец id: {}", bookerId);
         return bookingService.addBooking(bookingAddDto, bookerId);
     }
 
     @GetMapping("/{bookingId}")
-    public BookingDto getBookingById(@PathVariable Long bookingId, @RequestHeader(OWNER_ID) Long userId) {
+    public BookingDto getBookingById(@PathVariable Long bookingId,
+                                     @RequestHeader(OWNER_ID) Long userId) {
         log.info("GET-запрос к эндпоинту /bookings bookingId: {} и userId: {}", bookingId, userId);
         return bookingService.getBookingById(bookingId, userId);
     }
@@ -52,7 +53,7 @@ public class BookingController {
     @PatchMapping("/{bookingId}")
     public BookingDto updateBookingByOwner(@PathVariable Long bookingId,
                                            @RequestHeader(OWNER_ID) Long userId,
-                                           @RequestParam @NonNull Boolean approved) {
+                                           @RequestParam Boolean approved) {
         log.info("POST-запрос к эндпоинту /bookings/ обновление бронирования id: {}", bookingId);
         return bookingService.updateBookingByOwner(bookingId, userId, approved);
     }

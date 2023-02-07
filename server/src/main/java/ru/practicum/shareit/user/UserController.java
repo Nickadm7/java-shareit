@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 
-import javax.validation.Valid;
 import java.util.Collection;
 
 @Slf4j
@@ -28,13 +27,14 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto addUser(@Valid @RequestBody UserDto userDto) {
+    public UserDto addUser(@RequestBody UserDto userDto) {
         log.info("POST-запрос к эндпоинту /users пользователь с name: {} и email: {}", userDto.getName(), userDto.getEmail());
         return userService.addUser(userDto);
     }
 
     @PatchMapping("/{userId}")
-    public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable Long userId) {
+    public UserDto updateUser(@RequestBody UserDto userDto,
+                              @PathVariable Long userId) {
         log.info("PATCH-запрос к эндпоинту /users обновить пользователя по id: {}", userId);
         return userService.updateUser(userDto, userId);
     }

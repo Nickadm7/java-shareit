@@ -19,7 +19,8 @@ public class ItemController {
     private static final String OWNER_ID = "X-Sharer-User-Id";
 
     @PostMapping
-    public ItemDto addItems(@Valid @RequestBody ItemDto itemDto, @RequestHeader(OWNER_ID) Long ownerId) {
+    public ItemDto addItems(@Valid @RequestBody ItemDto itemDto,
+                            @RequestHeader(OWNER_ID) Long ownerId) {
         log.info("POST-запрос к эндпоинту /items owner_id: {}", ownerId);
         return itemService.addItem(itemDto, ownerId);
     }
@@ -39,7 +40,8 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemOutForFindDto getItemById(@PathVariable Long itemId, @RequestHeader(OWNER_ID) Long userId) {
+    public ItemOutForFindDto getItemById(@PathVariable Long itemId,
+                                         @RequestHeader(OWNER_ID) Long userId) {
         log.info("GET-запрос к эндпоинту /items найти пользователя по id: {}", itemId);
         return itemService.getItemById(itemId, userId);
     }
@@ -52,7 +54,8 @@ public class ItemController {
 
     @ResponseBody
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestBody ItemDto itemDto, @PathVariable Long itemId,
+    public ItemDto updateItem(@RequestBody ItemDto itemDto,
+                              @PathVariable Long itemId,
                               @RequestHeader(OWNER_ID) Long ownerId) {
         log.info("PATCH-запрос к эндпоинту /items обновить пользователя по id: {}", itemId);
         utils.isUserExist(ownerId);
@@ -60,7 +63,8 @@ public class ItemController {
     }
 
     @DeleteMapping("/{itemId}")
-    public void deleteById(@PathVariable Long itemId, @RequestHeader(OWNER_ID) Long ownerId) {
+    public void deleteById(@PathVariable Long itemId,
+                           @RequestHeader(OWNER_ID) Long ownerId) {
         log.info("DELETE-запрос к эндпоинту /items удалить пользователя с id: {}", itemId);
         itemService.deleteById(itemId, ownerId);
     }

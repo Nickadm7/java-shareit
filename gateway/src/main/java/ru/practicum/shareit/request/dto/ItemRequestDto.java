@@ -18,5 +18,4 @@ public class ItemRequestDto {
     private Long requestorId; //пользователь, который создает запрос
 
     private LocalDateTime created; //когда был создан запрос
-    //private List<ItemDto> items;
 }

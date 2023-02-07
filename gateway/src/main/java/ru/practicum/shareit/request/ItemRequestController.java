@@ -23,7 +23,7 @@ public class ItemRequestController {
 
     @PostMapping
     public ResponseEntity<Object> itemRequestAdd(@Valid @RequestBody ItemRequestDto itemRequestDto,
-                                         @RequestHeader(OWNER_ID) Long requestUserId) {
+                                                 @RequestHeader(OWNER_ID) Long requestUserId) {
         log.info("POST-запрос к эндпоинту //requests  requestUserId: {}", requestUserId);
         return itemRequestClient.create(requestUserId, itemRequestDto);
     }
@@ -36,7 +36,7 @@ public class ItemRequestController {
 
     @GetMapping("/{requestId}")
     public ResponseEntity<Object> findItemRequestById(@PathVariable("requestId") Long itemRequestId,
-                                              @RequestHeader(OWNER_ID) Long userId) {
+                                                      @RequestHeader(OWNER_ID) Long userId) {
         log.info("GET-запрос к эндпоинту /items поиск запроса по id: {}", userId);
         return itemRequestClient.findItemRequestById(userId, itemRequestId);
     }
