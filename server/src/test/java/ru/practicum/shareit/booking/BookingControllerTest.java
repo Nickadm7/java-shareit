@@ -37,7 +37,6 @@ public class BookingControllerTest {
     private final ObjectMapper mapper = new ObjectMapper();
     private static final String OWNER_ID = "X-Sharer-User-Id";
     LocalDateTime start = LocalDateTime.parse("2222-10-12T14:00");
-    LocalDateTime wrongStart = LocalDateTime.parse("1111-10-12T14:00");
     LocalDateTime end = LocalDateTime.parse("2222-12-12T14:00");
     User owner = new User(1L, "userOwnerTest", "userOwnerTest@mail.ru");
     User booker = new User(2L, "userBookerTest", "userBookerTest@mail.ru");
@@ -50,10 +49,6 @@ public class BookingControllerTest {
     BookingAddDto bookingAddDto = new BookingAddDto(1L,
             1L,
             start,
-            end);
-    BookingAddDto bookingAddDtoWrongStart = new BookingAddDto(1L,
-            1L,
-            wrongStart,
             end);
     BookingDto bookingDto = new BookingDto(1L,
             start,
@@ -84,23 +79,6 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$.end",
                         is(bookingDto.getEnd().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))))
                 .andExpect(jsonPath("$.status", is(bookingDto.getStatus().toString())));
-    }
-
-    @Test
-    @DisplayName("Тест добавление бронирования неверная дата начала")
-    void addBookingWrongStartTest() throws Exception {
-        mapper.registerModule(new JavaTimeModule());
-
-        when(bookingService.addBooking(any(), any(Long.class)))
-                .thenReturn(bookingDto);
-
-        mockMvc.perform(post("/bookings")
-                        .content(mapper.writeValueAsString(bookingAddDtoWrongStart))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header(OWNER_ID, 1))
-                .andExpect(status().is4xxClientError());
     }
 
     @Test

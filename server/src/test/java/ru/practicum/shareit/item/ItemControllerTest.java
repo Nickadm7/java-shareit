@@ -55,12 +55,6 @@ public class ItemControllerTest {
             true,
             null,
             null);
-    private final ItemDto itemDtoWrongName = new ItemDto(1L,
-            "",
-            "TestDescription",
-            true,
-            null,
-            null);
     private final ItemOutForFindDto itemOutForFindDto = new ItemOutForFindDto(1L,
             "ItemTestName",
             "TestDescription",
@@ -95,18 +89,6 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.name", is(itemDto.getName())))
                 .andExpect(jsonPath("$.description", is(itemDto.getDescription())))
                 .andExpect(jsonPath("$.available", is(itemDto.getAvailable())));
-    }
-
-    @Test
-    @DisplayName("Тест добавление вещи неправильное имя")
-    void addItemsWrongNameTest() throws Exception {
-        mockMvc.perform(post("/items")
-                        .content(mapper.writeValueAsString(itemDtoWrongName))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header(OWNER_ID, 1))
-                .andExpect(status().is4xxClientError());
     }
 
     @Test

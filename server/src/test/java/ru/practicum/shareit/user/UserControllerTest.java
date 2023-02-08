@@ -29,7 +29,6 @@ public class UserControllerTest {
     private final ObjectMapper mapper = new ObjectMapper();
 
     private final UserDto userDto = new UserDto(1L, "userTestName", "mailtest@mail.ru");
-    private final UserDto userDtoWrongEmail = new UserDto(1L, "userTestName", "mailtestmail.ru");
 
     @Test
     @DisplayName("Тест добавления пользователя")
@@ -108,17 +107,5 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
                 .andExpect(jsonPath("$.name", is(userDto.getName())))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
-    }
-
-    @Test
-    @DisplayName("Тест добавления пользователя неправильный email")
-    void addUserWrongEmailTest() throws Exception {
-
-        mockMvc.perform(post("/users")
-                        .content(mapper.writeValueAsString(userDtoWrongEmail))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().is4xxClientError());
     }
 }
